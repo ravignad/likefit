@@ -6,15 +6,15 @@ from scipy.stats import chi2
 class LeastSquares:  
 
 
-    def __init__(self, x, y, ysigma, model_function):  
+    def __init__(self, x, y, ysigma, model):  
         self.x = x
         self.y = y
         self.ysigma = ysigma
-        self.model_function = model_function
+        self.model = model
             
 
     def cost_function(self, theta): 
-        mu = self.model_function(self.x, theta)        
+        mu = self.model(self.x, theta)        
         residuals = (self.y - mu) / self.ysigma
         cost = np.sum(residuals**2)
         return cost
@@ -75,7 +75,7 @@ class LeastSquares:
         return self.fit_result
         
         
-    def get_fit_y(self, x):
+    def get_fit(self, x):
         estimators = self.get_estimators()
         return self.model(x, estimators) 
         
@@ -88,6 +88,7 @@ class LeastSquares:
         step = estimators * 0.01
         theta_up = estimators + step
         theta_down = estimators - step
+        # TODO: the gradient must be a vector corresponding to each theta coordinate 
         model_up = self.model(x, theta_up)
         model_down = self.model(x, theta_down)
         gradient = (model_up - model_down) / (2*step)
