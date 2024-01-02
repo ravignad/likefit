@@ -15,9 +15,7 @@ def fit_model(x, theta):
      return theta[0] + theta[1] * x + theta[2] * x**2 
 
 fit = LeastSquares(data["x"], data["y"], data["dy"], fit_model)
-
 seed = np.array([1, 1, 1])
-
 fit_result = fit(seed)
 
 print(f"Estimators: {fit.get_estimators()}")
@@ -31,7 +29,7 @@ print(f"Pvalue: {fit.get_pvalue()}")
 # Plot
 fig, ax = plt.subplots()
 ax.set_xlabel("x")
-ax.set_ylabel(r"y")
+ax.set_ylabel("y")
 
 ax.errorbar(data["x"], data["y"], data["dy"], ls='none', marker='o', label="Data")
 
