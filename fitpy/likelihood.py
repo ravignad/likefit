@@ -37,6 +37,21 @@ class LeastSquares:
         cost = np.sum(residuals**2)
         return cost
 
+    # Vectorized version of the cost function useful for plotting
+    def vcost_function(self, parx_index, pary_index, parx, pary):
+
+        vcost = []
+        for y in pary:
+            for x in parx:
+                theta = self.get_estimators().copy()
+                theta[parx_index] = x
+                theta[pary_index] = y
+                cost1 = self.cost_function(theta)
+                vcost.append(cost1)
+
+        vcost = np.reshape(vcost, newshape=(len(pary), len(parx)))
+        return vcost
+
     def __call__(self, seed):
         self.fit_result = minimize(self.cost_function, x0=seed)
 
