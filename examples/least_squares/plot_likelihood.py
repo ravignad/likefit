@@ -44,7 +44,8 @@ pary_max = estimators[pary_index] + nsigma*errors[pary_index]
 pary = np.linspace(pary_min, pary_max, num=50)
 
 x, y = np.meshgrid(parx, pary)
-z = fit.vcost_function(parx_index, pary_index, parx, pary)
+cost = fit.vcost_function(parx_index, pary_index, parx, pary)
+z = cost - cost.min()
 
 # Plot
 fig = plt.figure(figsize=(5, 4))
@@ -54,9 +55,13 @@ ax.set_ylabel(f"Parameter {pary_index}")
 ax.set_zlabel(r"$-2\log(L/L_{max})$")
 
 # Levels of the countour lines
-sigma_levels = np.arange(0, nsigma+2)
-bounds = z.min() + sigma_levels**2
-norm = colors.BoundaryNorm(boundaries=bounds, ncolors=256)
-ax.plot_surface(x, y, z, cmap=cm.coolwarm, norm=norm, rstride=1, cstride=1, linewidth=0)
+sigma_levels = np.arange(0, 7)
+bounds = sigma_levels**2
+norm = colors.BoundaryNorm(boundaries=bounds, ncolors=128)
+surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm, norm=norm)
+
+# Plot colorbar
+clb = plt.colorbar(surf, shrink=0.5, location='left')
+clb.ax.set_title(r"$\sigma^2$")
 
 plt.show()
