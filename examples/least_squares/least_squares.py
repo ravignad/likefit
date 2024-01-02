@@ -1,9 +1,8 @@
-# Pruebo cuadrados mínimos no-lineal de la librería likefit
+# Example of a least squares fit
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-# import sda
 from likelihood import LeastSquares
 
 
