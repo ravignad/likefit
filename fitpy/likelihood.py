@@ -9,7 +9,7 @@ def get_confidence_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1
 
     Args:
         center (np.ndarray): The center of the ellipse.
-        cova_pair (np.ndarray): The covariance matrix.
+        cova (np.ndarray): The covariance matrix.
         nsigma (int, optional): The number of standard deviations for the ellipse. Defaults to 1.
         npoints (int, optional): The number of points to generate on the ellipse. Defaults to 1000.
 
