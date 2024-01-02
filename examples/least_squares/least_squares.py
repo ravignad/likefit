@@ -48,6 +48,4 @@ ax.plot(xfit, yfit, ls='--', label="Fit")
 plt.legend()
 plt.tight_layout()
 
-plot_file = "least_squares.pdf"
-plt.savefig(plot_file)
-print(f"Fit plotted in {plot_file}")
+plt.show()
