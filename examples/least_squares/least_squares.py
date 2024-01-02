@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
 from likelihood import LeastSquares
 
 
@@ -41,8 +42,8 @@ xfit = np.linspace(start=xmin, stop=xmax, num=100)
 yfit = fit.get_yfit(xfit)
 ax.plot(xfit, yfit, ls='--', label="Fit")
 
-# yfit_error = fit.get_fit_error(xfit)
-# ax.fill_between(xfit, yfit-yfit_error, yfit+yfit_error, color='tab:orange', alpha=0.2)
+yfit_error = fit.get_yfit_error(xfit)
+ax.fill_between(xfit, yfit-yfit_error, yfit+yfit_error, color='tab:orange', alpha=0.2)
 
 plt.legend()
 plt.tight_layout()

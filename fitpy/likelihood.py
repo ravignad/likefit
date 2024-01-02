@@ -81,24 +81,35 @@ class LeastSquares:
         
         
     def get_yfit_error(self, x):
-        
+
         # Numerical derivative of the model wrt the parameters evaluated at the estimators
+        gradient_list = []
+
         estimators = self.get_estimators()
         errors = self.get_errors()
-        step = estimators * 0.01
-        theta_up = estimators + step
-        theta_down = estimators - step
-        # TODO: the gradient must be a vector corresponding to each theta coordinate 
-        model_up = self.model(x, theta_up)
-        model_down = self.model(x, theta_down)
-        gradient = (model_up - model_down) / (2*step)
+        delta_theta = errors * 0.01
+        ndimensions = len(delta_theta)
+
+        for i in range(ndimensions):
+            delta_theta1 = np.zeros_like(delta_theta)
+            step = delta_theta[i]
+            delta_theta1[i] = step
+            theta_down = estimators - delta_theta1
+            theta_up = estimators + delta_theta1
+            model_up = self.model(x, theta_up)
+            model_down = self.model(x, theta_down)
+            gradient1 = (model_up - model_down) / (2*step)
+            gradient_list.append(gradient1)
+
+        gradient_array = np.array(gradient_list)
         
         # Propagate parameter errors
-        covariance = self.get_covariance()
-        var_fit = np.einsum("ki,ij,kj->k", gradient, covariance, gradient)
-        sigma_fit = np.sqrt(var_fit)
+        covariance = self.get_covariance_matrix()
+        # var_yfit = np.einsum("ki,ij,kj->k", gradient_array, covariance, gradient_array)
+        var_yfit = np.einsum("ik,ij,jk->k", gradient_array, covariance, gradient_array)
+        sigma_yfit = np.sqrt(var_yfit)
         
-        return sigma_fit
+        return sigma_yfit
     
     
         
