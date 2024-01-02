@@ -45,5 +45,4 @@ ax.fill_between(xfit, yfit-yfit_error, yfit+yfit_error, color='tab:orange', alph
 
 plt.legend()
 plt.tight_layout()
-
 plt.show()

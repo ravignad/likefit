@@ -82,38 +82,55 @@ class LeastSquares:
         
     def get_yfit_error(self, x):
 
-        # Numerical derivative of the model wrt the parameters evaluated at the estimators
-        gradient_list = []
+        gradient = self.get_gradient(x)
 
-        estimators = self.get_estimators()
-        errors = self.get_errors()
-        delta_theta = errors * 0.01
-        ndimensions = len(delta_theta)
-
-        for i in range(ndimensions):
-            delta_theta1 = np.zeros_like(delta_theta)
-            step = delta_theta[i]
-            delta_theta1[i] = step
-            theta_down = estimators - delta_theta1
-            theta_up = estimators + delta_theta1
-            model_up = self.model(x, theta_up)
-            model_down = self.model(x, theta_down)
-            gradient1 = (model_up - model_down) / (2*step)
-            gradient_list.append(gradient1)
-
-        gradient_array = np.array(gradient_list)
-        
         # Propagate parameter errors
         covariance = self.get_covariance_matrix()
-        # var_yfit = np.einsum("ki,ij,kj->k", gradient_array, covariance, gradient_array)
-        var_yfit = np.einsum("ik,ij,jk->k", gradient_array, covariance, gradient_array)
+        var_yfit = np.einsum("ik,ij,jk->k", gradient, covariance, gradient)
         sigma_yfit = np.sqrt(var_yfit)
         
         return sigma_yfit
-    
-    
-        
-    
+
+
+    # Numerical derivative of the model wrt the parameters evaluated at the estimators
+    """
+    Arguments:
+        x (np.array): values of the independent variable at which the gradient will be evaluated
+    Return: 
+        gradient (np.array):  2 dimensional array containing the calculated gradient. 
+            The first dimension corresponds to the parameters and the second one to the values of 
+            the independent variable
+    """
+    def get_gradient(self, x):
+
+        estimators = self.get_estimators()
+        errors = self.get_errors()
+
+        # Setting finite difference steps to some fraction of the errors
+        delta_fraction = 0.01
+        steps = errors * 0.01
+        ndimensions = len(steps)
+
+        gradient = []
+        for i in range(ndimensions):
+
+            step1 = steps[i]
+
+            # Change an element of the parameter vector by step
+            delta_theta1 = np.zeros_like(steps)
+            delta_theta1[i] = step1
+            theta_down = estimators - delta_theta1
+            theta_up = estimators + delta_theta1
+
+            # Calculate an element of the gradient vector
+            model_up = self.model(x, theta_up)
+            model_down = self.model(x, theta_down)
+            gradient1 = (model_up - model_down) / (2 * step1)
+            gradient.append(gradient1)
+
+        return gradient
+
+
 # class Poisson(object):  
 
 #    def __call__(self, theta) :  
