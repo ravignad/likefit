@@ -1,1 +1,1 @@
-/home/lumi/fitpy/fitpy/likelihood.py
+../../fitpy/likelihood.py
