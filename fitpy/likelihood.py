@@ -3,6 +3,26 @@ from scipy.optimize import minimize
 from scipy.stats import chi2
 
 
+def get_confidence_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1, npoints: int = 100) -> np.ndarray:
+    """
+    Return the coordinates of a covariance ellipse.
+
+    Args:
+        center (np.ndarray): The center of the ellipse.
+        cova_pair (np.ndarray): The covariance matrix.
+        nsigma (int, optional): The number of standard deviations for the ellipse. Defaults to 1.
+        npoints (int, optional): The number of points to generate on the ellipse. Defaults to 1000.
+
+    Returns:
+        np.ndarray: The coordinates of the ellipse.
+    """
+    cholesky_l = np.linalg.cholesky(cova)
+    t = np.linspace(0, 2 * np.pi, npoints)
+    circle = np.column_stack([np.cos(t), np.sin(t)])
+    ellipse = nsigma * circle @ cholesky_l.T + center
+    return ellipse.T
+
+
 class LeastSquares:  
 
     def __init__(self, x, y, ysigma, model):  
@@ -38,6 +58,13 @@ class LeastSquares:
     def get_covariance_matrix(self):
         covariance = 2 * self.fit_result.hess_inv
         return covariance
+
+    def get_confidence_ellipse(self, xindex, yindex, nsigma: int = 1, npoints: int = 100):
+        estimators = self.get_estimators()
+        estimator_pair = estimators[[xindex, yindex]]
+        cova = self.get_covariance_matrix()
+        cova_pair = cova[np.ix_([xindex, yindex], [xindex, yindex])]
+        return get_confidence_ellipse(estimator_pair, cova_pair, nsigma, npoints)
 
     def get_correlation_matrix(self):
         covariance = self.get_covariance_matrix()
