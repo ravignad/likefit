@@ -75,12 +75,12 @@ class LeastSquares:
         return self.fit_result
         
         
-    def get_fit(self, x):
+    def get_yfit(self, x):
         estimators = self.get_estimators()
         return self.model(x, estimators) 
         
         
-    def get_fit_error(self, x):
+    def get_yfit_error(self, x):
         
         # Numerical derivative of the model wrt the parameters evaluated at the estimators
         estimators = self.get_estimators()

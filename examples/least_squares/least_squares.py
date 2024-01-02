@@ -39,7 +39,7 @@ xmin = 1
 xmax = 1.35
 xfit = np.linspace(start=xmin, stop=xmax, num=100)
 
-yfit =  fit.get_fit(xfit)
+yfit = fit.get_yfit(xfit)
 ax.plot(xfit, yfit, ls='--', label="Fit")
 
 # yfit_error = fit.get_fit_error(xfit)
