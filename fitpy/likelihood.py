@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import minimize
-from scipy.stats import chi2, poisson
+from scipy.stats import chi2
 from abc import ABC, abstractmethod
 
 
@@ -171,9 +171,9 @@ class LeastSquares(LikelihoodFit):
 
 class Poisson(LikelihoodFit):
 
-    def __init__(self, x, y, model):
+    def __init__(self, x, nevents, model):
         LikelihoodFit.__init__(self, x, model)
-        self.y = y
+        self.nevents = nevents
 
     # Poisson cost function
     def cost_function(self, par):
@@ -181,29 +181,26 @@ class Poisson(LikelihoodFit):
         mu = self.model(self.x, par)
 
         """
-            Piecewise-defined  function for case y!=0 and y=0
+            Piecewise-defined  function for cases y=0 and y!=0
             Note: scipy.stats.rv_discrete contains a negative log likelihood that does not work well.
             So we implement the cost function from scratch 
         """
 
-        # Select data points y!=0
-        zero_mask = (self.y == 0)
-        y1 = np.ma.array(self.y, mask=zero_mask)
-        mu1 = np.ma.array(mu, mask=zero_mask)
-        cost_array1 = 2 * (mu1 - y1) - 2 * y1 * np.log(mu1 / y1)
-        cost1 = cost_array1.sum()
-
         # Select data points y=0
-        mu2 = np.ma.array(mu, mask=np.logical_not(zero_mask))
-        cost_array2 = 2 * mu2
-        cost2 = cost_array2.sum()
+        zero_mask = (self.nevents == 0)
+        mu1 = np.ma.array(mu, mask=~zero_mask)
+        likelihood_ratio1 = -mu1
+        cost1 = -2 * likelihood_ratio1.sum()
+
+        # Select data points y!=0
+        nevents2 = np.ma.array(self.nevents, mask=zero_mask)
+        mu2 = np.ma.array(mu, mask=zero_mask)
+        likelihood_ratio2 = nevents2 * np.log(mu2 / nevents2) - (mu2 - nevents2)
+        cost2 = -2 * likelihood_ratio2.sum()
 
         cost = cost1 + cost2
 
         return cost
-
-
-
 
 
 class Binomial(LikelihoodFit):
@@ -254,5 +251,3 @@ class Binomial(LikelihoodFit):
 
         cost = cost1 + cost2 + cost3
         return cost
-
-
