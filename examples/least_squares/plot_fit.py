@@ -9,15 +9,14 @@ from likelihood import LeastSquares
 
 # fit_model vectorized in x
 def fit_model(x, theta):
-    return theta[0] + theta[1] * (x-1.2) + theta[2] * (x-1.2) ** 2
+    return theta[0] * np.exp(theta[1]*x)
 
 
 input_file = "least_squares.csv"
 data = pd.read_csv(input_file)
 
-# Fit data
 fit = LeastSquares(data["x"], data["y"], data["dy"], fit_model)
-seed = np.array([1, 1, 1])
+seed = np.array([0, 0])
 fit(seed)
 
 fig, ax = plt.subplots()
@@ -26,10 +25,11 @@ ax.set_ylabel("y")
 
 # Plot data
 ax.errorbar(fit.x, fit.y, fit.ysigma, ls='none', marker='o', label="Data")
-xmin = 1
-xmax = 1.35
+
 
 # Plot fit
+xmin = data["x"].min()
+xmax = data["x"].max()
 xfit = np.linspace(start=xmin, stop=xmax, num=100)
 yfit = fit.get_yfit(xfit)
 ax.plot(xfit, yfit, ls='--', label="Fit")
