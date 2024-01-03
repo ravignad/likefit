@@ -7,8 +7,8 @@ from likelihood import LeastSquares
 
 
 # fit_model vectorized in x
-def fit_model(x, theta):
-    return theta[0] * np.exp(theta[1]*x)
+def fit_model(x, par):
+    return par[0] * np.exp(par[1] * x)
 
 
 input_file = "least_squares.csv"

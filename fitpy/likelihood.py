@@ -31,8 +31,8 @@ class LeastSquares:
         self.ysigma = ysigma
         self.model = model
 
-    def cost_function(self, theta): 
-        mu = self.model(self.x, theta)        
+    def cost_function(self, par):
+        mu = self.model(self.x, par)
         residuals = (self.y - mu) / self.ysigma
         cost = np.sum(residuals**2)
         return cost
@@ -43,10 +43,10 @@ class LeastSquares:
         vcost = []
         for y in pary:
             for x in parx:
-                theta = self.get_estimators().copy()
-                theta[parx_index] = x
-                theta[pary_index] = y
-                cost1 = self.cost_function(theta)
+                par = self.get_estimators().copy()
+                par[parx_index] = x
+                par[pary_index] = y
+                cost1 = self.cost_function(par)
                 vcost.append(cost1)
 
         vcost = np.reshape(vcost, newshape=(len(pary), len(parx)))
@@ -144,14 +144,14 @@ class LeastSquares:
             step1 = steps[i]
 
             # Change an element of the parameter vector by step
-            delta_theta1 = np.zeros_like(steps)
-            delta_theta1[i] = step1
-            theta_down = estimators - delta_theta1
-            theta_up = estimators + delta_theta1
+            delta_par1 = np.zeros_like(steps)
+            delta_par1[i] = step1
+            par_down = estimators - delta_par1
+            par_up = estimators + delta_par1
 
             # Calculate an element of the gradient vector
-            model_up = self.model(x, theta_up)
-            model_down = self.model(x, theta_down)
+            model_up = self.model(x, par_up)
+            model_down = self.model(x, par_down)
             gradient1 = (model_up - model_down) / (2 * step1)
             gradient.append(gradient1)
 
@@ -160,7 +160,7 @@ class LeastSquares:
 
 # class Poisson(object):  
 
-#    def __call__(self, theta) :  
-#        mu = self.fit_model(theta)
+#    def __call__(self, par) :
+#        mu = self.fit_model(par)
 #        cost_array = 2 * (mu - self.k) - 2 * self.k * np.log(mu / self.k)
 #        return cost_array.sum()
