@@ -169,9 +169,32 @@ class LeastSquares(LikelihoodFit):
         return cost
 
 
-# class Poisson(object):  
 
-#    def __call__(self, par) :
-#        mu = self.fit_model(par)
-#        cost_array = 2 * (mu - self.k) - 2 * self.k * np.log(mu / self.k)
-#        return cost_array.sum()
+class Poisson(LikelihoodFit):
+
+    def __init__(self, x, y, model):
+        LikelihoodFit.__init__(self, x, y, model)
+
+
+    # Poisson cost function
+    def cost_function(self, par):
+
+        mu = self.model(self.x, par)
+
+        # Piecewise-defined  function for case y!=0 and y=0
+
+        # Select data points y!=0
+        zero_mask = (self.y == 0)
+        y1 = np.ma.array(self.y, mask=zero_mask)
+        mu1 = np.ma.array(mu, mask=zero_mask)
+        cost_array1 = 2 * (mu1 - y1) - 2 * y1 * np.log(mu1 / y1)
+        cost1 = cost_array1.sum()
+
+        # Select data points y=0
+        mu2 = np.ma.array(mu, mask=np.logical_not(zero_mask))
+        cost_array2 = 2 * mu2
+        cost2 = cost_array2.sum()
+
+        cost = cost1 + cost2
+
+        return cost
