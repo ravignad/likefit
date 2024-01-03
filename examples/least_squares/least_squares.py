@@ -1,6 +1,7 @@
 # Example of fitting data with the least squares method
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from likelihood import LeastSquares
 
@@ -25,3 +26,26 @@ print(f"Correlation matrix: {fit.get_correlation_matrix()}")
 print(f"Deviance: {fit.get_deviance()}")
 print(f"Degrees of freedom: {fit.get_ndof()}")
 print(f"Pvalue: {fit.get_pvalue()}")
+
+# Plot
+fig, ax = plt.subplots()
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+
+# Plot data
+ax.errorbar(fit.x, fit.y, fit.ysigma, ls='none', marker='o', label="Data")
+
+# Plot fit
+xmin = xdata.min()
+xmax = xdata.max()
+xfit = np.linspace(start=xmin, stop=xmax, num=100)
+yfit = fit.get_yfit(xfit)
+ax.plot(xfit, yfit, ls='--', label="Fit")
+
+# Plot error band
+yfit_error = fit.get_yfit_error(xfit)
+ax.fill_between(xfit, yfit - yfit_error, yfit + yfit_error, color='tab:orange', alpha=0.2)
+
+plt.legend()
+plt.tight_layout()
+plt.show()
