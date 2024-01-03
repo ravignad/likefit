@@ -26,7 +26,6 @@ ax.set_ylabel("y")
 # Plot data
 ax.errorbar(fit.x, fit.y, fit.ysigma, ls='none', marker='o', label="Data")
 
-
 # Plot fit
 xmin = data["x"].min()
 xmax = data["x"].max()
