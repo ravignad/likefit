@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import chi2
+from abc import ABC, abstractmethod
 
 
 def get_confidence_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1, npoints: int = 100) -> np.ndarray:
@@ -23,19 +24,16 @@ def get_confidence_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1
     return ellipse.T
 
 
-class LeastSquares:  
+class LikelihoodFit(ABC):
 
-    def __init__(self, x, y, ysigma, model):  
+    def __init__(self, x, y, model):
         self.x = x
         self.y = y
-        self.ysigma = ysigma
         self.model = model
 
+    @abstractmethod
     def cost_function(self, par):
-        mu = self.model(self.x, par)
-        residuals = (self.y - mu) / self.ysigma
-        cost = np.sum(residuals**2)
-        return cost
+        pass
 
     # Vectorized version of the cost function useful for plotting
     def vcost_function(self, parx_index, pary_index, parx, pary):
@@ -156,6 +154,19 @@ class LeastSquares:
             gradient.append(gradient1)
 
         return gradient
+
+
+class LeastSquares(LikelihoodFit):
+
+    def __init__(self, x, y, ysigma, model):
+        LikelihoodFit.__init__(self, x, y, model)
+        self.ysigma = ysigma
+
+    def cost_function(self, par):
+        mu = self.model(self.x, par)
+        residuals = (self.y - mu) / self.ysigma
+        cost = np.sum(residuals**2)
+        return cost
 
 
 # class Poisson(object):  
