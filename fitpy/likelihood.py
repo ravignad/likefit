@@ -169,12 +169,10 @@ class LeastSquares(LikelihoodFit):
         return cost
 
 
-
 class Poisson(LikelihoodFit):
 
     def __init__(self, x, y, model):
         LikelihoodFit.__init__(self, x, y, model)
-
 
     # Poisson cost function
     def cost_function(self, par):

@@ -28,6 +28,7 @@ print(f"Deviance: {fit.get_deviance()}")
 print(f"Degrees of freedom: {fit.get_ndof()}")
 print(f"Pvalue: {fit.get_pvalue()}")
 
+# Plot
 fig, ax = plt.subplots()
 ax.set_xlabel("x")
 ax.set_ylabel("y")
