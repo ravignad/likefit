@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import minimize
-from scipy.stats import chi2
+from scipy.stats import chi2, poisson
 from abc import ABC, abstractmethod
 
 
@@ -26,9 +26,8 @@ def get_confidence_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1
 
 class LikelihoodFit(ABC):
 
-    def __init__(self, x, y, model):
+    def __init__(self, x, model):
         self.x = x
-        self.y = y
         self.model = model
 
     @abstractmethod
@@ -159,7 +158,8 @@ class LikelihoodFit(ABC):
 class LeastSquares(LikelihoodFit):
 
     def __init__(self, x, y, ysigma, model):
-        LikelihoodFit.__init__(self, x, y, model)
+        LikelihoodFit.__init__(self, x, model)
+        self.y = y
         self.ysigma = ysigma
 
     def cost_function(self, par):
@@ -172,14 +172,19 @@ class LeastSquares(LikelihoodFit):
 class Poisson(LikelihoodFit):
 
     def __init__(self, x, y, model):
-        LikelihoodFit.__init__(self, x, y, model)
+        LikelihoodFit.__init__(self, x, model)
+        self.y = y
 
     # Poisson cost function
     def cost_function(self, par):
 
         mu = self.model(self.x, par)
 
-        # Piecewise-defined  function for case y!=0 and y=0
+        """
+            Piecewise-defined  function for case y!=0 and y=0
+            Note: scipy.stats.rv_discrete contains a negative log likelihood that does not work well.
+            So we implement the cost function from scratch 
+        """
 
         # Select data points y!=0
         zero_mask = (self.y == 0)
@@ -196,3 +201,58 @@ class Poisson(LikelihoodFit):
         cost = cost1 + cost2
 
         return cost
+
+
+
+
+
+class Binomial(LikelihoodFit):
+
+    def __init__(self, x, ntrials, nsuccess, model):
+        LikelihoodFit.__init__(self, x, model)
+        self.ntrials = ntrials
+        self.nsuccess = nsuccess
+
+    # Binomial cost function
+    def cost_function(self, par):
+
+        # Bernoulli probability for each x according to the model
+        proba = self.model(self.x, par)
+
+        # Maximum likelihood estimator of the Bernoulli probability
+        proba_mle = self.nsuccess / self.ntrials
+
+        """
+        Piecewise-defined function for cases:
+            1) nsuccess=0
+            2) 0 < nsuccess < ntrials
+            3) nsuccess=ntrials
+        """
+
+        # Case nsuccess = 0
+        zero_mask = self.nsuccess == 0
+        proba1 = np.ma.array(proba, mask=~zero_mask)
+        ntrials1 = np.ma.array(self.ntrials, mask=~zero_mask)
+        likelihood_ratio1 = ntrials1 * np.log(1-proba1)
+        cost1 = -2 * likelihood_ratio1.sum()
+
+        # Case 0 < nsuccess < ntrials
+        intermediate_mask = np.logical_and(0 < self.nsuccess, self.nsuccess < self.ntrials)
+        proba2 = np.ma.array(proba, mask=~intermediate_mask)
+        ntrials2 = np.ma.array(self.ntrials, mask=~intermediate_mask)
+        proba_mle2 = np.ma.array(proba_mle, mask=~intermediate_mask)
+        likelihood_ratio2 = ntrials2 * (proba_mle2*np.log(proba2/proba_mle2)
+                                        + (1-proba_mle2)*np.log((1-proba2)/(1-proba_mle2)))
+        cost2 = -2 * likelihood_ratio2.sum()
+
+        # Case nsuccess = ntrials
+        ntrials_mask = self.nsuccess == self.ntrials
+        proba3 = np.ma.array(proba, mask=~ntrials_mask)
+        ntrials3 = np.ma.array(self.ntrials, mask=~ntrials_mask)
+        likelihood_ratio3 = ntrials3 * np.log(proba3)
+        cost3 = -2 * likelihood_ratio3.sum()
+
+        cost = cost1 + cost2 + cost3
+        return cost
+
+
