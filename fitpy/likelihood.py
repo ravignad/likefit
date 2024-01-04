@@ -1,7 +1,8 @@
+from abc import ABC, abstractmethod
+
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import chi2
-from abc import ABC, abstractmethod
 
 
 def get_confidence_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1, npoints: int = 100) -> np.ndarray:
@@ -98,8 +99,8 @@ class LikelihoodFit(ABC):
         pvalue = chi2.sf(deviance, ndof)
         return pvalue
 
-    def get_minimize_result(self):
-        return self.fit_result
+    # def get_minimize_result(self):
+    #    return self.fit_result
 
     def get_yfit(self, x):
         estimators = self.get_estimators()
@@ -153,6 +154,53 @@ class LikelihoodFit(ABC):
             gradient.append(gradient1)
 
         return gradient
+
+
+class LinearLeastSquares(LikelihoodFit):
+
+    def __init__(self, x, y, ysigma, npar, model):
+        LikelihoodFit.__init__(self, x, model)
+        self.y = y
+        self.ysigma = ysigma
+        self.npar = npar
+        self.__set_model_matrix()
+
+    def __set_model_matrix(self):
+        column_list = []
+
+        for pari in range(self.npar):
+            unit_vector = np.zeros(shape=self.npar)
+            unit_vector[pari] = 1
+            matrix_column = self.model(self.x, unit_vector)
+            column_list.append(matrix_column)
+
+        self.model_matrix = np.array(column_list)
+
+    def cost_function(self, par):
+        mu = self.model(self.x, par)
+        residuals = (self.y - mu) / self.ysigma
+        cost = np.sum(residuals**2)
+        return cost
+
+    def __call__(self):
+
+        inv_var_y = self.ysigma**(-2)
+        inv_cova_par = np.einsum('ij,j,lj', self.model_matrix, inv_var_y, self.model_matrix)
+        self.cova_par = np.linalg.inv(inv_cova_par)
+        matrix_b = np.einsum('ij,jk,k -> ik', self.cova_par, self.model_matrix, inv_var_y)
+        self.estimators = np.einsum('ij,j', matrix_b, self.y)
+
+    def get_covariance_matrix(self):
+        return self.cova_par
+
+    def get_deviance(self):
+        residuals = self.y - self.get_yfit(self.x)
+        z_array = residuals/self.ysigma
+        chi2_min = np.sum(z_array**2)
+        return chi2_min
+
+    def get_estimators(self):
+        return self.estimators
 
 
 class LeastSquares(LikelihoodFit):
