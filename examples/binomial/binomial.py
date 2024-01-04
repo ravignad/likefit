@@ -36,7 +36,7 @@ ax.set_ylabel("y")
 ydata = nsuccess / ntrials
 ax.plot(xdata, ydata, ls='none', marker='o', label="Data")
 
-# Plot fit
+# Plot fitter
 xmin = xdata.min()
 xmax = xdata.max()
 xfit = np.linspace(start=xmin, stop=xmax, num=100)
