@@ -39,3 +39,5 @@ plt.plot(ellipse2_x, ellipse2_y, label=r"2σ")
 plt.legend()
 plt.tight_layout()
 plt.show()
+
+# plt.savefig("ellipses.png")

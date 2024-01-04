@@ -49,3 +49,5 @@ ax.fill_between(xfit, yfit - yfit_error, yfit + yfit_error, color='tab:orange', 
 plt.legend()
 plt.tight_layout()
 plt.show()
+
+# plt.savefig("least_squares.png")

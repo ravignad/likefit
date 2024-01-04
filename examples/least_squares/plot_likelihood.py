@@ -64,3 +64,5 @@ clb = plt.colorbar(surf, shrink=0.5, location='left')
 clb.ax.set_title(r"$\sigma^2$")
 
 plt.show()
+
+# plt.savefig("likelihood.png")
