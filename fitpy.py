@@ -1,28 +1,10 @@
+# Library to fit data with several likelihood functions
+
 from abc import ABC, abstractmethod
 
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import chi2
-
-
-def get_confidence_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1, npoints: int = 100) -> np.ndarray:
-    """
-    Return the coordinates of a covariance ellipse.
-
-    Args:
-        center (np.ndarray): The center of the ellipse.
-        cova (np.ndarray): The covariance matrix.
-        nsigma (int, optional): The number of standard deviations for the ellipse. Defaults to 1.
-        npoints (int, optional): The number of points to generate on the ellipse. Defaults to 1000.
-
-    Returns:
-        np.ndarray: The coordinates of the ellipse.
-    """
-    cholesky_l = np.linalg.cholesky(cova)
-    t = np.linspace(0, 2 * np.pi, npoints)
-    circle = np.column_stack([np.cos(t), np.sin(t)])
-    ellipse = nsigma * circle @ cholesky_l.T + center
-    return ellipse.T
 
 
 class LikelihoodFit(ABC):
@@ -73,11 +55,20 @@ class LikelihoodFit(ABC):
         return covariance
 
     def get_confidence_ellipse(self, xindex, yindex, nsigma: int = 1, npoints: int = 100):
+
+        # Get the estimators and covariance matrix for a pair of estimators
         estimators = self.get_estimators()
         estimator_pair = estimators[[xindex, yindex]]
         cova = self.get_covariance_matrix()
         cova_pair = cova[np.ix_([xindex, yindex], [xindex, yindex])]
-        return get_confidence_ellipse(estimator_pair, cova_pair, nsigma, npoints)
+
+        # Calculate the nσ ellipse for the estimator pair
+        cholesky_l = np.linalg.cholesky(cova_pair)
+        t = np.linspace(0, 2 * np.pi, npoints)
+        circle = np.column_stack([np.cos(t), np.sin(t)])
+        ellipse = nsigma * circle @ cholesky_l.T + estimator_pair
+
+        return ellipse.T
 
     def get_correlation_matrix(self):
         covariance = self.get_covariance_matrix()
@@ -123,7 +114,7 @@ class LikelihoodFit(ABC):
 
     # Return an array with the difference between the data and the fit
     def get_residuals(self):
-        return self.get_ydata() - self.get_yfit()
+        return self.get_ydata() - self.get_yfit(self.x)
 
     # Numerical derivative of the model wrt the parameters evaluated at the estimators
     """
@@ -317,4 +308,4 @@ class Binomial(LikelihoodFit):
         return cost
 
     def get_ydata(self):
-        return self.nevents / self.ntrials
+        return self.nsuccess / self.ntrials
