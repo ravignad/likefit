@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from likelihood import Binomial
+from fitpy import Binomial
 
 xdata = np.arange(start=0.05, stop=1.05, step=0.05)
 ntrials = np.full(xdata.shape, 30)

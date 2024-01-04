@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
-from likelihood import Poisson
+from fitpy import Poisson
 
 
 # fit_model vectorized in x

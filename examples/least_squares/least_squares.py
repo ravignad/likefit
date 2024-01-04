@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from likelihood import LeastSquares
+from fitpy import LeastSquares
 
 
 # fit_model vectorized in x
