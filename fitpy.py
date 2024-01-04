@@ -107,7 +107,6 @@ class LikelihoodFit(ABC):
         return self.model(x, estimators) 
 
     def get_yfit_error(self, x):
-
         gradient = self.get_gradient(x)
 
         # Propagate parameter errors
@@ -116,6 +115,15 @@ class LikelihoodFit(ABC):
         sigma_yfit = np.sqrt(var_yfit)
         
         return sigma_yfit
+
+    # Return an array with the maximum likelihood estimator of each data point
+    @abstractmethod
+    def get_ydata(self):
+        pass
+
+    # Return an array with the difference between the data and the fit
+    def get_residuals(self):
+        return self.get_ydata() - self.get_yfit()
 
     # Numerical derivative of the model wrt the parameters evaluated at the estimators
     """
@@ -183,7 +191,6 @@ class LinearLeastSquares(LikelihoodFit):
         return cost
 
     def fit(self):
-
         inv_var_y = self.ysigma**(-2)
         inv_cova_par = np.einsum('ij,j,lj', self.model_matrix, inv_var_y, self.model_matrix)
         self.cova_par = np.linalg.inv(inv_cova_par)
@@ -202,6 +209,9 @@ class LinearLeastSquares(LikelihoodFit):
     def get_estimators(self):
         return self.estimators
 
+    def get_ydata(self):
+        return self.y
+
 
 class LeastSquares(LikelihoodFit):
 
@@ -215,6 +225,9 @@ class LeastSquares(LikelihoodFit):
         residuals = (self.y - mu) / self.ysigma
         cost = np.sum(residuals**2)
         return cost
+
+    def get_ydata(self):
+        return self.y
 
 
 class Poisson(LikelihoodFit):
@@ -249,6 +262,9 @@ class Poisson(LikelihoodFit):
         cost = cost1 + cost2
 
         return cost
+
+    def get_ydata(self):
+        return self.nevents
 
 
 class Binomial(LikelihoodFit):
@@ -299,3 +315,6 @@ class Binomial(LikelihoodFit):
 
         cost = cost1 + cost2 + cost3
         return cost
+
+    def get_ydata(self):
+        return self.nevents / self.ntrials
