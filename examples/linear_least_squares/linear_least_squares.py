@@ -18,7 +18,7 @@ npar = 2
 
 fitter = LinearLeastSquares(xdata, ydata, ysigma, npar, fit_model)
 
-fitter()
+fitter.fit()
 
 print(f"Estimators: {fitter.get_estimators()}")
 print(f"Errors: {fitter.get_errors()}")

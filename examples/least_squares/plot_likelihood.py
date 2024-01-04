@@ -19,9 +19,9 @@ xdata = np.array([0., 0.2, 0.4, 0.6, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2.])
 ydata = np.array([0.92, 0.884, 0.626, 0.504, 0.481, 0.417, 0.288, 0.302, 0.177, 0.13, 0.158])
 ysigma = np.array([0.1, 0.082, 0.067, 0.055, 0.045, 0.037, 0.03, 0.025, 0.02, 0.017, 0.014])
 
-fit = LeastSquares(xdata, ydata, ysigma, fit_model)
+fitter = LeastSquares(xdata, ydata, ysigma, fit_model)
 seed = np.array([0, 0])
-fit(seed)
+fitter.fit(seed)
 
 # Indexes of the parameters to plot
 parx_index = 0
@@ -31,8 +31,8 @@ pary_index = 1
 nsigma = 2
 
 # Calculate coordinates of the points to plot
-estimators = fit.get_estimators()
-errors = fit.get_errors()
+estimators = fitter.get_estimators()
+errors = fitter.get_errors()
 
 parx_min = estimators[parx_index] - nsigma*errors[parx_index]
 parx_max = estimators[parx_index] + nsigma*errors[parx_index]
@@ -43,7 +43,7 @@ pary_max = estimators[pary_index] + nsigma*errors[pary_index]
 pary = np.linspace(pary_min, pary_max, num=50)
 
 x, y = np.meshgrid(parx, pary)
-cost = fit.vcost_function(parx_index, pary_index, parx, pary)
+cost = fitter.vcost_function(parx_index, pary_index, parx, pary)
 z = cost - cost.min()
 
 # Plot

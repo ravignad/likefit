@@ -50,7 +50,7 @@ class LikelihoodFit(ABC):
         vcost = np.reshape(vcost, newshape=(len(pary), len(parx)))
         return vcost
 
-    def __call__(self, seed):
+    def fit(self, seed):
         self.fit_result = minimize(self.cost_function, x0=seed)
 
         if not self.fit_result.success:
@@ -182,7 +182,7 @@ class LinearLeastSquares(LikelihoodFit):
         cost = np.sum(residuals**2)
         return cost
 
-    def __call__(self):
+    def fit(self):
 
         inv_var_y = self.ysigma**(-2)
         inv_cova_par = np.einsum('ij,j,lj', self.model_matrix, inv_var_y, self.model_matrix)
