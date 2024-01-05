@@ -112,11 +112,10 @@ The example below fits a normal distribution to a histogram
 ```py
 import numpy as np
 from scipy.stats import norm
-import matplotlib.pyplot as plt
 from likefit import Poisson
 
 xdata = np.linspace(start=-2.9, stop=2.9, num=30)
-ydata = np.array([0, 2, 5, 8, 7, 18, 15, 27, 34, 51, 55, 63, 67, 75, 90, 78, 73, 70, 62, 51, 33, 26, 30, 17, 15, 14, 5,
+nevents = np.array([0, 2, 5, 8, 7, 18, 15, 27, 34, 51, 55, 63, 67, 75, 90, 78, 73, 70, 62, 51, 33, 26, 30, 17, 15, 14, 5,
                   4, 1, 0])
 
 
@@ -125,7 +124,7 @@ def fit_model(x, par):
     return par[0] * norm.pdf(x, loc=par[1], scale=par[2])
 
 
-fitter = Poisson(xdata, ydata, fit_model)
+fitter = Poisson(xdata, nevents, fit_model)
 seed = np.array([1, 0, 1])
 fitter.fit(seed)
 ```
@@ -136,7 +135,6 @@ Fit efficiency data with a sigmoid function
 
 ```py
 import numpy as np
-import matplotlib.pyplot as plt
 from likefit import Binomial
 
 xdata = np.arange(start=0.05, stop=1.05, step=0.05)
