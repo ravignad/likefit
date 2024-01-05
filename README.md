@@ -19,7 +19,7 @@ python -m pip install fitlike
 
 ## How to use
 
-Examples taken from the [examples folder](examples)
+Examples from [this folder](examples)
 
 ### Nonlinear least squares
 
