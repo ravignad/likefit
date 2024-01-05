@@ -1,5 +1,9 @@
 __pycache__/
 .idea/
 venv/
-fitlike.egg-info/
+
+
+# Distribution / packaging
+likefit.egg-info/
 requirements.txt
+dist/
