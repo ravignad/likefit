@@ -2,7 +2,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from likefit import LeastSquares
+
+import likefit
 
 xdata = np.array([0., 0.2, 0.4, 0.6, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2.])
 ydata = np.array([0.92, 0.884, 0.626, 0.504, 0.481, 0.417, 0.288, 0.302, 0.177, 0.13, 0.158])
@@ -14,7 +15,7 @@ def fit_model(x, par):
     return par[0] * np.exp(par[1] * x)
 
 
-fitter = LeastSquares(xdata, ydata, ysigma, fit_model)
+fitter = likefit.LeastSquares(xdata, ydata, ysigma, fit_model)
 seed = np.array([0, 0])
 fitter.fit(seed)
 

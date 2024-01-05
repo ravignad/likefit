@@ -2,7 +2,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from likefit import Binomial
+
+import likefit
 
 xdata = np.arange(start=0.05, stop=1.05, step=0.05)
 ntrials = np.full(xdata.shape, 30)
@@ -14,7 +15,7 @@ def fit_model(x, par):
     return 1 / (1+np.exp(-(x-par[0])/par[1]))
 
 
-fitter = Binomial(xdata, ntrials, nsuccess, fit_model)
+fitter = likefit.Binomial(xdata, ntrials, nsuccess, fit_model)
 seed = np.array([0.5, 1])
 fitter.fit(seed)
 

@@ -25,8 +25,8 @@ Example of fitting data with a nonlinear least squares method
 
 ```py
 import numpy as np
-import matplotlib.pyplot as plt
-from likefit import LeastSquares
+
+import likefit
 
 xdata = np.array([0., 0.2, 0.4, 0.6, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2.])
 ydata = np.array([0.92, 0.884, 0.626, 0.504, 0.481, 0.417, 0.288, 0.302, 0.177, 0.13, 0.158])
@@ -38,7 +38,7 @@ def fit_model(x, par):
     return par[0] * np.exp(par[1] * x)
 
 # Create a least squares fitter and inititalize it with the data and the fit model
-fitter = LeastSquares(xdata, ydata, ysigma, fit_model)
+fitter = likefit.LeastSquares(xdata, ydata, ysigma, fit_model)
 
 # Fit the data
 seed = np.array([0, 0])
@@ -57,6 +57,8 @@ Plotting the fit and the error band
 
 ```py
 # Plot
+import matplotlib.pyplot as plt
+
 fig, ax = plt.subplots()
 ax.set_xlabel("x")
 ax.set_ylabel("y")
@@ -87,7 +89,8 @@ Support of linear least squares fits with a similar interface to the nonlinear c
 
 ```py
 import numpy as np
-from likefit import LinearLeastSquares
+
+import likefit
 
 xdata = np.array([1.02, 1.06, 1.1, 1.14, 1.18, 1.22, 1.26, 1.3, 1.34])
 ydata = np.array([2.243, 2.217, 2.201, 2.175, 2.132, 2.116, 2.083, 2.016, 2.004])
@@ -100,7 +103,7 @@ def fit_model(x, par):
     return par[0] + par[1] * (x - 1.2)
 
 
-fitter = LinearLeastSquares(xdata, ydata, ysigma, npar, fit_model)
+fitter = likefit.LinearLeastSquares(xdata, ydata, ysigma, npar, fit_model)
 fitter.fit()  # Seed not needed
 ```
 
@@ -111,7 +114,8 @@ The example below fits a normal distribution to a histogram
 ```py
 import numpy as np
 from scipy.stats import norm
-from likefit import Poisson
+
+import likefit
 
 xdata = np.linspace(start=-2.9, stop=2.9, num=30)
 nevents = np.array([0, 2, 5, 8, 7, 18, 15, 27, 34, 51, 55, 63, 67, 75, 90, 78, 73, 70, 62, 51, 33, 26, 30, 17, 15, 14, 5,
@@ -123,7 +127,7 @@ def fit_model(x, par):
     return par[0] * norm.pdf(x, loc=par[1], scale=par[2])
 
 
-fitter = Poisson(xdata, nevents, fit_model)
+fitter = likefit.Poisson(xdata, nevents, fit_model)
 seed = np.array([1, 0, 1])
 fitter.fit(seed)
 ```
@@ -134,7 +138,8 @@ Fit efficiency data with a sigmoid function
 
 ```py
 import numpy as np
-from likefit import Binomial
+
+import likefit
 
 xdata = np.arange(start=0.05, stop=1.05, step=0.05)
 ntrials = np.full(xdata.shape, 30)
@@ -146,10 +151,9 @@ def fit_model(x, par):
     return 1 / (1 + np.exp(-(x - par[0]) / par[1]))
 
 
-fitter = Binomial(xdata, ntrials, nsuccess, fit_model)
+fitter = likefit.Binomial(xdata, ntrials, nsuccess, fit_model)
 seed = np.array([0.5, 1])
 fitter.fit(seed)
-
 ```
 
 ## Contributing
