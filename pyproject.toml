@@ -5,9 +5,9 @@ requires      = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fitlike"
+name = "likefit"
 version = "0.1.0"
-description = "Fit data with likelihood loss functions"
+description = "Fit data with least squares and other likelihood methods"
 readme = "README.md"
 authors = [{ name = "Diego Ravignani", email = "diego.ravignani@gmail.com" }]
 license = { file = "LICENSE" }
