@@ -1,3 +1,5 @@
 __pycache__/
 .idea/
 venv/
+fitlike.egg-info/
+requirements.txt
