@@ -1,33 +1,29 @@
-# FitPy
+# LikeFit
 
-FitPy is an open-source library to fit data in science and engineering. It provides a simple yet complete interface to fit data with compact Python programs. 
+LikeFit is an open-source library to fit data in science and engineering. 
+It provides a simple yet complete interface to SciPy that performs linear and nolinear least squares and other likelihood fits. 
 
-## Getting started
+## Install
 
-Download [fitpy.py](fit.py) to a folder in your computer. 
-Add the folder to your PYTHONPATH. 
-
-For example, in Linux you can put the file in the folder ~/python and add the following to the your ~/.bashrc file
-
-```bash
-export PYTHONPATH=${HOME}/python:${PYTHONPATH}
+```sh
+python -m pip install fitlike
 ```
 
 ## Features
   * Linear and nonlinear least squares fits
-  * Poisson likelihood ready to fit histograms
+  * Poisson likelihood to fit histograms
   * Binomial likelihood 
-  * Calculation of estimators and errors
+  * Calculation of estimators, errors, and correlations
   * Evaluation of goodness-of-fit with chi-squared test
   * Support for plotting error bands, confidence ellipses, and likelihood functions
 
-## Usage
+## How to use
 
 Examples taken from the [examples folder](examples)
 
 ### Nonlinear least squares
 
-Example of fitting data and plotting with a nonlinear least squares method
+Example of fitting data with a nonlinear least squares method
 
 ```py
 import numpy as np
@@ -55,7 +51,11 @@ print(f"Correlation matrix: {fitter.get_correlation_matrix()}")
 print(f"Deviance: {fitter.get_deviance()}")
 print(f"Degrees of freedom: {fitter.get_ndof()}")
 print(f"Pvalue: {fitter.get_pvalue()}")
+```
 
+Plotting the fit and the error band
+
+```py
 # Plot
 fig, ax = plt.subplots()
 ax.set_xlabel("x")
@@ -83,8 +83,7 @@ plt.show()
 
 ### Linear least squares
 
-Support of a linear least squares fit with a similar interface to the nonlinear case.
-No need to provide a design matrix or do metaprogramming to describe the fit model with a string.
+Support of linear least squares fits with a similar interface to the nonlinear case.
 
 ```py
 import numpy as np
@@ -108,7 +107,7 @@ fitter.fit()  # Seed not needed
 
 ### Poisson
 
-Fit a normal distribution to a histogram
+The example below fits a normal distribution to a histogram
 
 ```py
 import numpy as np
