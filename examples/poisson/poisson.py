@@ -3,7 +3,7 @@
 import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
-from fitpy import Poisson
+from likefit import Poisson
 
 xdata = np.linspace(start=-2.9, stop=2.9, num=30)
 ydata = np.array([0, 2, 5, 8, 7, 18, 15, 27, 34, 51, 55, 63, 67, 75, 90, 78, 73, 70, 62, 51, 33, 26, 30, 17, 15, 14, 5,

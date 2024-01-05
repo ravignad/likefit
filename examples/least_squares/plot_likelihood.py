@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib import colors
 
-from fitpy import LeastSquares
+from likefit import LeastSquares
 
 
 # fit_model vectorized in x

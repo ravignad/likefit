@@ -32,7 +32,7 @@ Example of fitting data and plotting with a nonlinear least squares method
 ```py
 import numpy as np
 import matplotlib.pyplot as plt
-from fitpy import LeastSquares
+from likefit import LeastSquares
 
 xdata = np.array([0., 0.2, 0.4, 0.6, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2.])
 ydata = np.array([0.92, 0.884, 0.626, 0.504, 0.481, 0.417, 0.288, 0.302, 0.177, 0.13, 0.158])
@@ -89,17 +89,17 @@ No need to provide a design matrix or do metaprogramming to describe the fit mod
 ```py
 import numpy as np
 import matplotlib.pyplot as plt
-from fitpy import LinearLeastSquares
+from likefit import LinearLeastSquares
 
-xdata = np.array([1.02, 1.06, 1.1 , 1.14, 1.18, 1.22, 1.26, 1.3 , 1.34])
+xdata = np.array([1.02, 1.06, 1.1, 1.14, 1.18, 1.22, 1.26, 1.3, 1.34])
 ydata = np.array([2.243, 2.217, 2.201, 2.175, 2.132, 2.116, 2.083, 2.016, 2.004])
-ysigma = np.array([0.008, 0.008, 0.01 , 0.009, 0.011, 0.016, 0.018, 0.021, 0.017])
+ysigma = np.array([0.008, 0.008, 0.01, 0.009, 0.011, 0.016, 0.018, 0.021, 0.017])
 npar = 2
 
 
 # Model linear in the parameters 
 def fit_model(x, par):
-    return par[0] + par[1] * (x-1.2)
+    return par[0] + par[1] * (x - 1.2)
 
 
 fitter = LinearLeastSquares(xdata, ydata, ysigma, npar, fit_model)
@@ -114,7 +114,7 @@ Fit a normal distribution to a histogram
 import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
-from fitpy import Poisson
+from likefit import Poisson
 
 xdata = np.linspace(start=-2.9, stop=2.9, num=30)
 ydata = np.array([0, 2, 5, 8, 7, 18, 15, 27, 34, 51, 55, 63, 67, 75, 90, 78, 73, 70, 62, 51, 33, 26, 30, 17, 15, 14, 5,
@@ -133,12 +133,12 @@ fitter.fit(seed)
 
 ### Binomial
 
-Fit efficiency data with a sigmoid function 
+Fit efficiency data with a sigmoid function
 
 ```py
 import numpy as np
 import matplotlib.pyplot as plt
-from fitpy import Binomial
+from likefit import Binomial
 
 xdata = np.arange(start=0.05, stop=1.05, step=0.05)
 ntrials = np.full(xdata.shape, 30)
@@ -147,7 +147,7 @@ nsuccess = np.array([0, 0, 0, 3, 3, 2, 8, 5, 4, 11, 18, 15, 19, 20, 26, 24, 26, 
 
 # fit_model is sigmoid function vectorized in x
 def fit_model(x, par):
-    return 1 / (1+np.exp(-(x-par[0])/par[1]))
+    return 1 / (1 + np.exp(-(x - par[0]) / par[1]))
 
 
 fitter = Binomial(xdata, ntrials, nsuccess, fit_model)

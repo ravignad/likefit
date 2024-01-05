@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from fitpy import LinearLeastSquares
+from likefit import LinearLeastSquares
 
 xdata = np.array([1.02, 1.06, 1.1 , 1.14, 1.18, 1.22, 1.26, 1.3 , 1.34])
 ydata = np.array([2.243, 2.217, 2.201, 2.175, 2.132, 2.116, 2.083, 2.016, 2.004])
