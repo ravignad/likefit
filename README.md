@@ -87,7 +87,6 @@ Support of linear least squares fits with a similar interface to the nonlinear c
 
 ```py
 import numpy as np
-import matplotlib.pyplot as plt
 from likefit import LinearLeastSquares
 
 xdata = np.array([1.02, 1.06, 1.1, 1.14, 1.18, 1.22, 1.26, 1.3, 1.34])
@@ -158,7 +157,7 @@ If you'd like to contribute, please fork the repository and use a feature
 branch. Pull requests are warmly welcome.
 
 ## Links
-- Repository: https://github.com/ravignad/fitpy/
+- Repository: https://github.com/ravignad/likefit/
 
 ## Licensing
 The code in this project is licensed under MIT license.
