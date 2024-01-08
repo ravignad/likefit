@@ -10,10 +10,11 @@ import matplotlib.pyplot as plt
 
 class LikelihoodFit(ABC):
 
-    def __init__(self, x, model):
+    def __init__(self, x, model, par_names=None):
         self.x = x
         self.model = model
         self.fit_result = None
+        self.par_names = par_names
 
     @abstractmethod
     def cost_function(self, par):
@@ -189,6 +190,28 @@ class LikelihoodFit(ABC):
         # Plot error band
         yfit_error = self.get_yfit_error(xfit)
         ax.fill_between(xfit, yfit - yfit_error, yfit + yfit_error, color='tab:orange', alpha=0.2)
+
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+
+
+    # Plot the 1σ and 2σ confidence ellipses
+    # The ellipses are calculated from the covariance matrix of the estimators
+    def plot_confidence_ellipses(self, parx_index, pary_index):
+
+        # Plot
+        fig, ax = plt.subplots()
+        ax.set_xlabel(f"Parameter {parx_index}")
+        ax.set_ylabel(f"Parameter {pary_index}")
+
+        estimators = self.get_estimators()
+        plt.plot(estimators[parx_index], estimators[pary_index], 'o', label="Estimator")
+
+        ellipse1_x, ellipse1_y = self.get_confidence_ellipse(parx_index, pary_index, nsigma=1)
+        plt.plot(ellipse1_x, ellipse1_y, label=r"1σ")
+        ellipse2_x, ellipse2_y = self.get_confidence_ellipse(parx_index, pary_index, nsigma=2)
+        plt.plot(ellipse2_x, ellipse2_y, label=r"2σ")
 
         plt.legend()
         plt.tight_layout()

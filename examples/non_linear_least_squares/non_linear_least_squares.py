@@ -21,4 +21,8 @@ fitter.print_results()
 # Plot data and fit
 fitter.plot_fit()
 
+# Plot the 1σ and 2σ confidence ellipses
+# The first parameter is in x-axis and the second parameter in the y-axis
+fitter.plot_confidence_ellipses(parx_index=0, pary_index=1)
+
 # plt.savefig("non_linear_least_squares.png")
