@@ -37,8 +37,9 @@ ysigma = np.array([0.1, 0.082, 0.067, 0.055, 0.045, 0.037, 0.03, 0.025, 0.02, 0.
 def fit_model(x, par):
     return par[0] * np.exp(par[1] * x)
 
+
 # Create a least squares fitter and inititalize it with the data and the fit model
-fitter = likefit.LeastSquares(xdata, ydata, ysigma, fit_model)
+fitter = likefit.NonLinearLeastSquares(xdata, ydata, ysigma, fit_model)
 
 # Fit the data
 seed = np.array([0, 0])

@@ -15,7 +15,7 @@ def fit_model(x, par):
     return par[0] * np.exp(par[1] * x)
 
 
-fitter = likefit.LeastSquares(xdata, ydata, ysigma, fit_model)
+fitter = likefit.NonLinearLeastSquares(xdata, ydata, ysigma, fit_model)
 seed = np.array([0, 0])
 fitter.fit(seed)
 fitter.print_results()

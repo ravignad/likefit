@@ -213,7 +213,7 @@ class LinearLeastSquares(LikelihoodFit):
         return self.y
 
 
-class LeastSquares(LikelihoodFit):
+class NonLinearLeastSquares(LikelihoodFit):
 
     def __init__(self, x, y, ysigma, model):
         LikelihoodFit.__init__(self, x, model)
