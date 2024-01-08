@@ -41,4 +41,4 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-# plt.savefig("least_squares.png")
+# plt.savefig("non_linear_least_squares.png")
