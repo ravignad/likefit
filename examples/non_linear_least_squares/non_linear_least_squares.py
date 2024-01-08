@@ -22,7 +22,7 @@ fitter.print_results()
 fitter.plot_fit()
 
 # Plot the 1σ and 2σ confidence ellipses
-# The first parameter is in x-axis and the second parameter in the y-axis
 fitter.plot_confidence_ellipses(parx_index=0, pary_index=1)
 
-# plt.savefig("non_linear_least_squares.png")
+# Plot the cost function minimized during the fit
+fitter.plot_cost_function(parx_index=0, pary_index=1)

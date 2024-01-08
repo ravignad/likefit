@@ -6,6 +6,7 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import chi2
 import matplotlib.pyplot as plt
+from matplotlib import cm, colors
 
 
 class LikelihoodFit(ABC):
@@ -198,6 +199,8 @@ class LikelihoodFit(ABC):
 
     # Plot the 1σ and 2σ confidence ellipses
     # The ellipses are calculated from the covariance matrix of the estimators
+    # Two parameters must be selected
+    # The first parameter is in x-axis and the second parameter in the y-axis
     def plot_confidence_ellipses(self, parx_index, pary_index):
 
         # Plot
@@ -215,6 +218,49 @@ class LikelihoodFit(ABC):
 
         plt.legend()
         plt.tight_layout()
+        plt.show()
+
+    # Plot a surface of the fit cost function
+    # Two parameters must be selected
+    # The first parameter is in x-axis and the second parameter in the y-axis
+    def plot_cost_function(self, parx_index, pary_index):
+
+        # Confidence levels to include in the plot
+        nsigma = 2
+
+        # Calculate coordinates of the points to plot
+        estimators = self.get_estimators()
+        errors = self.get_errors()
+
+        parx_min = estimators[parx_index] - nsigma * errors[parx_index]
+        parx_max = estimators[parx_index] + nsigma * errors[parx_index]
+        parx = np.linspace(parx_min, parx_max, num=50)
+
+        pary_min = estimators[pary_index] - nsigma * errors[pary_index]
+        pary_max = estimators[pary_index] + nsigma * errors[pary_index]
+        pary = np.linspace(pary_min, pary_max, num=50)
+
+        x, y = np.meshgrid(parx, pary)
+        cost = self.vcost_function(parx_index, pary_index, parx, pary)
+        z = cost - cost.min()
+
+        # Plot
+        fig = plt.figure(figsize=(5, 4))
+        ax = fig.subplots(subplot_kw={"projection": "3d"})
+        ax.set_xlabel(f"Parameter {parx_index}")
+        ax.set_ylabel(f"Parameter {pary_index}")
+        ax.set_zlabel(r"$-2\log(L/L_{max})$")
+
+        # Levels of the countour lines
+        sigma_levels = np.arange(0, 7)
+        bounds = sigma_levels ** 2
+        norm = colors.BoundaryNorm(boundaries=bounds, ncolors=128)
+        surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm, norm=norm)
+
+        # Plot colorbar
+        clb = plt.colorbar(surf, shrink=0.5, location='left')
+        clb.ax.set_title(r"$\sigma^2$")
+
         plt.show()
 
 
