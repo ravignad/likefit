@@ -1,13 +1,11 @@
 # Example of fitting data with a linear least squares method
 
 import numpy as np
-import matplotlib.pyplot as plt
-
 import likefit
 
-xdata = np.array([1.02, 1.06, 1.1 , 1.14, 1.18, 1.22, 1.26, 1.3 , 1.34])
+xdata = np.array([1.02, 1.06, 1.1, 1.14, 1.18, 1.22, 1.26, 1.3, 1.34])
 ydata = np.array([2.243, 2.217, 2.201, 2.175, 2.132, 2.116, 2.083, 2.016, 2.004])
-ysigma = np.array([0.008, 0.008, 0.01 , 0.009, 0.011, 0.016, 0.018, 0.021, 0.017])
+ysigma = np.array([0.008, 0.008, 0.01, 0.009, 0.011, 0.016, 0.018, 0.021, 0.017])
 npar = 2
 
 
@@ -20,25 +18,5 @@ fitter = likefit.LinearLeastSquares(xdata, ydata, ysigma, npar, fit_model)
 fitter.fit()
 fitter.print_results()
 
-# Plot
-fig, ax = plt.subplots()
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-
-# Plot data
-ax.errorbar(fitter.x, fitter.y, fitter.ysigma, ls='none', marker='o', label="Data")
-
-# Plot fitter
-xmin = xdata.min()
-xmax = xdata.max()
-xfit = np.linspace(start=xmin, stop=xmax, num=100)
-yfit = fitter.get_yfit(xfit)
-ax.plot(xfit, yfit, ls='--', label="Fit")
-
-# Plot error band
-yfit_error = fitter.get_yfit_error(xfit)
-ax.fill_between(xfit, yfit - yfit_error, yfit + yfit_error, color='tab:orange', alpha=0.2)
-
-plt.legend()
-plt.tight_layout()
-plt.show()
+# Plot data and fit
+fitter.plot_fit()

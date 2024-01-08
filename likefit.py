@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import chi2
+import matplotlib.pyplot as plt
 
 
 class LikelihoodFit(ABC):
@@ -12,6 +13,7 @@ class LikelihoodFit(ABC):
     def __init__(self, x, model):
         self.x = x
         self.model = model
+        self.fit_result = None
 
     @abstractmethod
     def cost_function(self, par):
@@ -112,6 +114,11 @@ class LikelihoodFit(ABC):
     def get_ydata(self):
         pass
 
+    # Return an array with the error of each data point
+    @abstractmethod
+    def get_ydata_errors(self):
+        pass
+
     # Return an array with the difference between the data and the fit
     def get_residuals(self):
         return self.get_ydata() - self.get_yfit(self.x)
@@ -163,6 +170,30 @@ class LikelihoodFit(ABC):
         print(f"Degrees of freedom: {self.get_ndof()}")
         print(f"Pvalue: {self.get_pvalue()}")
 
+    def plot_fit(self):
+        # Plot
+        fig, ax = plt.subplots()
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+
+        # Plot data
+        ax.errorbar(self.x, self.get_ydata(), self.get_ydata_errors(), ls='none', marker='o', label="Data")
+
+        # Plot fitter
+        xmin = self.x.min()
+        xmax = self.x.max()
+        xfit = np.linspace(start=xmin, stop=xmax, num=100)
+        yfit = self.get_yfit(xfit)
+        ax.plot(xfit, yfit, ls='--', label="Fit")
+
+        # Plot error band
+        yfit_error = self.get_yfit_error(xfit)
+        ax.fill_between(xfit, yfit - yfit_error, yfit + yfit_error, color='tab:orange', alpha=0.2)
+
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+
 
 class LinearLeastSquares(LikelihoodFit):
 
@@ -212,6 +243,9 @@ class LinearLeastSquares(LikelihoodFit):
     def get_ydata(self):
         return self.y
 
+    def get_ydata_errors(self):
+        return self.ysigma
+
 
 class NonLinearLeastSquares(LikelihoodFit):
 
@@ -228,6 +262,9 @@ class NonLinearLeastSquares(LikelihoodFit):
 
     def get_ydata(self):
         return self.y
+
+    def get_ydata_errors(self):
+        return self.ysigma
 
 
 class Poisson(LikelihoodFit):
@@ -265,6 +302,10 @@ class Poisson(LikelihoodFit):
 
     def get_ydata(self):
         return self.nevents
+
+    # Approximated Poisson errors
+    def get_ydata_errors(self):
+        return np.sqrt(self.nevents)
 
 
 class Binomial(LikelihoodFit):
@@ -318,3 +359,9 @@ class Binomial(LikelihoodFit):
 
     def get_ydata(self):
         return self.nsuccess / self.ntrials
+
+    # Approximated binomial errors, not valid when nsucces~0 or nsuccess~ntrials
+    def get_ydata_errors(self):
+        proba_mle = self.get_ydata()
+        ydata_variance = self.ntrials * proba_mle * (1-proba_mle)
+        return np.sqrt(ydata_variance)

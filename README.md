@@ -74,7 +74,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-![](examples/non_linear_least_squares/least_squares.png)
+![](examples/non_linear_least_squares/non_linear_least_squares.png)
 
 
 ### Linear least squares

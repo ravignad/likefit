@@ -19,6 +19,7 @@ classifiers = [
 keywords = ["fit", "likelihood", "scipy"]
 dependencies = [
     "scipy >= 1.9.3",
+    "matplotlib >= 3.7.4"
 ]
 requires-python = ">=3.10"
 
@@ -26,5 +27,5 @@ requires-python = ">=3.10"
 Homepage = "https://github.com/ravignad/likefit"
 
 [project.optional-dependencies]
-dev = ["pip-tools", "matplotlib"]
+dev = ["pip-tools"]
 

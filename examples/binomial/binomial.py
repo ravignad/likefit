@@ -1,8 +1,6 @@
 # Example of fitting data with the least squares method
 
 import numpy as np
-import matplotlib.pyplot as plt
-
 import likefit
 
 xdata = np.arange(start=0.05, stop=1.05, step=0.05)
@@ -20,26 +18,5 @@ seed = np.array([0.5, 1])
 fitter.fit(seed)
 fitter.print_results()
 
-# Plot
-fig, ax = plt.subplots()
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-
-# Plot data
-ydata = nsuccess / ntrials
-ax.plot(xdata, ydata, ls='none', marker='o', label="Data")
-
-# Plot fitter
-xmin = xdata.min()
-xmax = xdata.max()
-xfit = np.linspace(start=xmin, stop=xmax, num=100)
-yfit = fitter.get_yfit(xfit)
-ax.plot(xfit, yfit, ls='--', label="Fit")
-
-# Plot error band
-yfit_error = fitter.get_yfit_error(xfit)
-ax.fill_between(xfit, yfit - yfit_error, yfit + yfit_error, color='tab:orange', alpha=0.2)
-
-plt.legend()
-plt.tight_layout()
-plt.show()
+# Plot data and fit
+fitter.plot_fit()
