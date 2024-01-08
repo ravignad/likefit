@@ -14,9 +14,20 @@ def fit_model(x, par):
     return par[0] + par[1] * (x-1.2)
 
 
+# Create the fitter
 fitter = likefit.LinearLeastSquares(xdata, ydata, ysigma, npar, fit_model)
+
+# Fit the data
 fitter.fit()
+
+# Output the fit results
 fitter.print_results()
 
 # Plot data and fit
 fitter.plot_fit()
+
+# Plot the confidence ellipses
+fitter.plot_confidence_ellipses(parx_index=0, pary_index=1)
+
+# Plot the cost function
+fitter.plot_cost_function(parx_index=0, pary_index=1)
