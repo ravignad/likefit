@@ -43,14 +43,7 @@ fitter = likefit.LeastSquares(xdata, ydata, ysigma, fit_model)
 # Fit the data
 seed = np.array([0, 0])
 fitter.fit(seed)
-
-print(f"Estimators: {fitter.get_estimators()}")
-print(f"Errors: {fitter.get_errors()}")
-print(f"Covariance matrix: {fitter.get_covariance_matrix()}")
-print(f"Correlation matrix: {fitter.get_correlation_matrix()}")
-print(f"Deviance: {fitter.get_deviance()}")
-print(f"Degrees of freedom: {fitter.get_ndof()}")
-print(f"Pvalue: {fitter.get_pvalue()}")
+fitter.print_results()
 ```
 
 Plotting the fit and the error band
@@ -105,6 +98,7 @@ def fit_model(x, par):
 
 fitter = likefit.LinearLeastSquares(xdata, ydata, ysigma, npar, fit_model)
 fitter.fit()  # Seed not needed
+fitter.print_results()
 ```
 
 ### Poisson
@@ -130,6 +124,7 @@ def fit_model(x, par):
 fitter = likefit.Poisson(xdata, nevents, fit_model)
 seed = np.array([1, 0, 1])
 fitter.fit(seed)
+fitter.print_results()
 ```
 
 ### Binomial
@@ -154,6 +149,7 @@ def fit_model(x, par):
 fitter = likefit.Binomial(xdata, ntrials, nsuccess, fit_model)
 seed = np.array([0.5, 1])
 fitter.fit(seed)
+fitter.print_results()
 ```
 
 ## Contributing

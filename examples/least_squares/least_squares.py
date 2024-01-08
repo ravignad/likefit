@@ -18,14 +18,7 @@ def fit_model(x, par):
 fitter = likefit.LeastSquares(xdata, ydata, ysigma, fit_model)
 seed = np.array([0, 0])
 fitter.fit(seed)
-
-print(f"Estimators: {fitter.get_estimators()}")
-print(f"Errors: {fitter.get_errors()}")
-print(f"Covariance matrix: {fitter.get_covariance_matrix()}")
-print(f"Correlation matrix: {fitter.get_correlation_matrix()}")
-print(f"Deviance: {fitter.get_deviance()}")
-print(f"Degrees of freedom: {fitter.get_ndof()}")
-print(f"Pvalue: {fitter.get_pvalue()}")
+fitter.print_results()
 
 # Plot
 fig, ax = plt.subplots()

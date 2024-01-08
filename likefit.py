@@ -154,6 +154,15 @@ class LikelihoodFit(ABC):
 
         return gradient
 
+    def print_results(self):
+        print(f"Estimators: {self.get_estimators()}")
+        print(f"Errors: {self.get_errors()}")
+        print(f"Covariance matrix: {self.get_covariance_matrix()}")
+        print(f"Correlation matrix: {self.get_correlation_matrix()}")
+        print(f"Deviance: {self.get_deviance()}")
+        print(f"Degrees of freedom: {self.get_ndof()}")
+        print(f"Pvalue: {self.get_pvalue()}")
+
 
 class LinearLeastSquares(LikelihoodFit):
 

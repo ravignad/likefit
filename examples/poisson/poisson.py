@@ -19,14 +19,7 @@ def fit_model(x, par):
 fitter = likefit.Poisson(xdata, nevents, fit_model)
 seed = np.array([1, 0, 1])
 fitter.fit(seed)
-
-print(f"Estimators: {fitter.get_estimators()}")
-print(f"Errors: {fitter.get_errors()}")
-print(f"Covariance matrix: {fitter.get_covariance_matrix()}")
-print(f"Correlation matrix: {fitter.get_correlation_matrix()}")
-print(f"Deviance: {fitter.get_deviance()}")
-print(f"Degrees of freedom: {fitter.get_ndof()}")
-print(f"Pvalue: {fitter.get_pvalue()}")
+fitter.print_results()
 
 # Plot
 fig, ax = plt.subplots()
