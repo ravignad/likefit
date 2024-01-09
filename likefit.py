@@ -15,26 +15,29 @@ def normal_cost(ydata, yfit, ydata_error):
     return np.sum(z_scores**2)
 
 
-def poisson_cost(nevents, yfit):
+def poisson_cost(mu, nevents):
     """
         Piecewise-defined  function for cases ydata=0 and ydata!=0
         Note: scipy.stats.rv_discrete contains a negative log likelihood that does not work well.
         So we implement the cost function from scratch
     """
 
+    likelihood_ratio = np.zeros_like(mu)
+    cost = np.zeros_like(mu)
+
     # Select data points ydata=0
     zero_mask = (nevents == 0)
-    mu1 = np.ma.array(yfit, mask=~zero_mask)
+    mu1 = mu[zero_mask]
     likelihood_ratio1 = -mu1
-    cost1 = -2 * likelihood_ratio1.sum()
+    cost1 = -2 * likelihood_ratio1
+    cost[zero_mask] += cost1
 
     # Select data points ydata!=0
-    nevents2 = np.ma.array(nevents, mask=zero_mask)
-    mu2 = np.ma.array(yfit, mask=zero_mask)
+    mu2 = mu[~zero_mask]
+    nevents2 = nevents[~zero_mask]
     likelihood_ratio2 = nevents2 * np.log(mu2 / nevents2) - (mu2 - nevents2)
-    cost2 = -2 * likelihood_ratio2.sum()
-
-    cost = cost1 + cost2
+    cost2 = -2 * likelihood_ratio2
+    cost[~zero_mask] += cost2
 
     return cost
 
@@ -456,7 +459,8 @@ class Poisson(LikelihoodFitter):
     # Poisson cost function
     def cost_function(self, par):
         yfit = self.model(self.xdata, par)
-        return poisson_cost(self.nevents, yfit)
+        data_point_costs = poisson_cost(yfit, self.nevents)
+        return data_point_costs.sum()
 
     def get_ydata(self):
         return self.nevents
