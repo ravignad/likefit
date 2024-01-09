@@ -21,8 +21,8 @@ fitter.print_results()
 # Plot data and fit
 fitter.plot_fit()
 
-# Plot the 1σ and 2σ confidence ellipses
-fitter.plot_confidence_ellipses(parx_index=0, pary_index=1)
+# Plot the 1σ and 2σ confidence regions
+fitter.plot_confidence_regions(parx_index=0, pary_index=1)
 
 # Plot the cost function minimized during the fit
 fitter.plot_cost_function(parx_index=0, pary_index=1)
