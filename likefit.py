@@ -39,6 +39,45 @@ def poisson_cost(nevents, yfit):
     return cost
 
 
+def binomial_cost(nsuccess, ntrials, proba):
+
+    # Maximum likelihood estimator of the Bernoulli probability
+    proba_mle = nsuccess / ntrials
+
+    """
+    Piecewise-defined function for cases:
+        1) nsuccess=0
+        2) 0 < nsuccess < ntrials
+        3) nsuccess=ntrials
+    """
+
+    # Case nsuccess = 0
+    zero_mask = nsuccess == 0
+    proba1 = np.ma.array(proba, mask=~zero_mask)
+    ntrials1 = np.ma.array(ntrials, mask=~zero_mask)
+    likelihood_ratio1 = ntrials1 * np.log(1 - proba1)
+    cost1 = -2 * likelihood_ratio1.sum()
+
+    # Case 0 < nsuccess < ntrials
+    intermediate_mask = np.logical_and(0 < nsuccess, nsuccess < ntrials)
+    proba2 = np.ma.array(proba, mask=~intermediate_mask)
+    ntrials2 = np.ma.array(ntrials, mask=~intermediate_mask)
+    proba_mle2 = np.ma.array(proba_mle, mask=~intermediate_mask)
+    likelihood_ratio2 = ntrials2 * (proba_mle2 * np.log(proba2 / proba_mle2)
+                                    + (1 - proba_mle2) * np.log((1 - proba2) / (1 - proba_mle2)))
+    cost2 = -2 * likelihood_ratio2.sum()
+
+    # Case nsuccess = ntrials
+    ntrials_mask = nsuccess == ntrials
+    proba3 = np.ma.array(proba, mask=~ntrials_mask)
+    ntrials3 = np.ma.array(ntrials, mask=~ntrials_mask)
+    likelihood_ratio3 = ntrials3 * np.log(proba3)
+    cost3 = -2 * likelihood_ratio3.sum()
+
+    cost = cost1 + cost2 + cost3
+    return cost
+
+
 # Base class of all fitters
 class LikelihoodFitter(ABC):
 
@@ -436,45 +475,9 @@ class Binomial(LikelihoodFitter):
 
     # Binomial cost function
     def cost_function(self, par):
-
         # Bernoulli probability for each xdata according to the model
-        proba = self.model(self.xdata, par)
-
-        # Maximum likelihood estimator of the Bernoulli probability
-        proba_mle = self.nsuccess / self.ntrials
-
-        """
-        Piecewise-defined function for cases:
-            1) nsuccess=0
-            2) 0 < nsuccess < ntrials
-            3) nsuccess=ntrials
-        """
-
-        # Case nsuccess = 0
-        zero_mask = self.nsuccess == 0
-        proba1 = np.ma.array(proba, mask=~zero_mask)
-        ntrials1 = np.ma.array(self.ntrials, mask=~zero_mask)
-        likelihood_ratio1 = ntrials1 * np.log(1-proba1)
-        cost1 = -2 * likelihood_ratio1.sum()
-
-        # Case 0 < nsuccess < ntrials
-        intermediate_mask = np.logical_and(0 < self.nsuccess, self.nsuccess < self.ntrials)
-        proba2 = np.ma.array(proba, mask=~intermediate_mask)
-        ntrials2 = np.ma.array(self.ntrials, mask=~intermediate_mask)
-        proba_mle2 = np.ma.array(proba_mle, mask=~intermediate_mask)
-        likelihood_ratio2 = ntrials2 * (proba_mle2*np.log(proba2/proba_mle2)
-                                        + (1-proba_mle2)*np.log((1-proba2)/(1-proba_mle2)))
-        cost2 = -2 * likelihood_ratio2.sum()
-
-        # Case nsuccess = ntrials
-        ntrials_mask = self.nsuccess == self.ntrials
-        proba3 = np.ma.array(proba, mask=~ntrials_mask)
-        ntrials3 = np.ma.array(self.ntrials, mask=~ntrials_mask)
-        likelihood_ratio3 = ntrials3 * np.log(proba3)
-        cost3 = -2 * likelihood_ratio3.sum()
-
-        cost = cost1 + cost2 + cost3
-        return cost
+        yfit = self.model(self.xdata, par)
+        return binomial_cost(self.nsuccess, self.ntrials, yfit)
 
     def get_ydata(self):
         return self.nsuccess / self.ntrials
@@ -482,5 +485,5 @@ class Binomial(LikelihoodFitter):
     # Approximated binomial errors, not valid when nsuccess~0 or nsuccess~ntrials
     def get_ydata_errors(self):
         proba_mle = self.get_ydata()
-        ydata_variance =  proba_mle * (1-proba_mle) / self.ntrials
+        ydata_variance = proba_mle * (1-proba_mle) / self.ntrials
         return np.sqrt(ydata_variance)
