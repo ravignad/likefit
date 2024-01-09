@@ -9,9 +9,34 @@ import matplotlib.pyplot as plt
 from matplotlib import cm, colors
 
 
+# Cost functions of the dependent variable y
 def normal_cost(ydata, yfit, ydata_error):
     z_scores = (ydata - yfit) / ydata_error
     return np.sum(z_scores**2)
+
+
+def poisson_cost(nevents, yfit):
+    """
+        Piecewise-defined  function for cases ydata=0 and ydata!=0
+        Note: scipy.stats.rv_discrete contains a negative log likelihood that does not work well.
+        So we implement the cost function from scratch
+    """
+
+    # Select data points ydata=0
+    zero_mask = (nevents == 0)
+    mu1 = np.ma.array(yfit, mask=~zero_mask)
+    likelihood_ratio1 = -mu1
+    cost1 = -2 * likelihood_ratio1.sum()
+
+    # Select data points ydata!=0
+    nevents2 = np.ma.array(nevents, mask=zero_mask)
+    mu2 = np.ma.array(yfit, mask=zero_mask)
+    likelihood_ratio2 = nevents2 * np.log(mu2 / nevents2) - (mu2 - nevents2)
+    cost2 = -2 * likelihood_ratio2.sum()
+
+    cost = cost1 + cost2
+
+    return cost
 
 
 # Base class of all fitters
@@ -391,30 +416,8 @@ class Poisson(LikelihoodFitter):
 
     # Poisson cost function
     def cost_function(self, par):
-
-        mu = self.model(self.xdata, par)
-
-        """
-            Piecewise-defined  function for cases ydata=0 and ydata!=0
-            Note: scipy.stats.rv_discrete contains a negative log likelihood that does not work well.
-            So we implement the cost function from scratch 
-        """
-
-        # Select data points ydata=0
-        zero_mask = (self.nevents == 0)
-        mu1 = np.ma.array(mu, mask=~zero_mask)
-        likelihood_ratio1 = -mu1
-        cost1 = -2 * likelihood_ratio1.sum()
-
-        # Select data points ydata!=0
-        nevents2 = np.ma.array(self.nevents, mask=zero_mask)
-        mu2 = np.ma.array(mu, mask=zero_mask)
-        likelihood_ratio2 = nevents2 * np.log(mu2 / nevents2) - (mu2 - nevents2)
-        cost2 = -2 * likelihood_ratio2.sum()
-
-        cost = cost1 + cost2
-
-        return cost
+        yfit = self.model(self.xdata, par)
+        return poisson_cost(self.nevents, yfit)
 
     def get_ydata(self):
         return self.nevents
