@@ -223,11 +223,9 @@ class LikelihoodFitter(ABC):
 
     # Plot a surface of the fit cost function
     # Two parameters must be selected
-    # The first parameter is in x-axis and the second parameter in the y-axis
-    def plot_cost_function(self, parx_index, pary_index, parx_name=None, pary_name=None):
-
-        # Confidence levels to include in the plot
-        nsigma = 2
+    # The first parameter is in x-axis and the second parameter in the y-axisç
+    # nsgima: number of nσ confidence levels to plot
+    def plot_cost_function(self, parx_index, pary_index, parx_name=None, pary_name=None, nsigma=2):
 
         # Calculate coordinates of the points to plot
         estimators = self.get_estimators()
