@@ -7,3 +7,6 @@ venv/
 likefit.egg-info/
 requirements.txt
 dist/
+
+# Jupyter notebook internal stuff
+.ipynb_checkpoints
