@@ -10,8 +10,8 @@ from matplotlib import cm, colors
 
 
 # Cost functions of the dependent variable y
-def normal_cost(ydata, yfit, ydata_error):
-    z_scores = (ydata - yfit) / ydata_error
+def normal_cost(mu, ydata, ydata_error):
+    z_scores = (ydata - mu) / ydata_error
     return z_scores**2
 
 
@@ -418,7 +418,7 @@ class LinearLeastSquares(LikelihoodFitter):
 
     def cost_function(self, par):
         yfit = self.model(self.xdata, par)
-        data_point_costs = normal_cost(self.ydata, yfit, self.ydata_error)
+        data_point_costs = normal_cost(yfit, self.ydata, self.ydata_error)
         return data_point_costs.sum()
 
     def fit(self):
@@ -456,7 +456,7 @@ class NonLinearLeastSquares(LikelihoodFitter):
 
     def cost_function(self, par):
         yfit = self.model(self.xdata, par)
-        data_point_costs = normal_cost(self.ydata, yfit, self.ydata_error)
+        data_point_costs = normal_cost(yfit, self.ydata, self.ydata_error)
         return data_point_costs.sum()
 
     def get_ydata(self):
