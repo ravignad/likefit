@@ -212,10 +212,10 @@ class LikelihoodFitter(ABC):
         estimators = self.get_estimators()
         plt.plot(estimators[parx_index], estimators[pary_index], 'o', label="Estimator")
 
-        ellipse1_x, ellipse1_y = self.get_confidence_ellipse(parx_index, pary_index, nsigma=1)
-        plt.plot(ellipse1_x, ellipse1_y, label=r"1σ")
-        ellipse2_x, ellipse2_y = self.get_confidence_ellipse(parx_index, pary_index, nsigma=2)
-        plt.plot(ellipse2_x, ellipse2_y, label=r"2σ")
+        ellipse1 = self.get_confidence_ellipse(parx_index, pary_index, nsigma=1)
+        plt.plot(*ellipse1, label=r"1σ")
+        ellipse2 = self.get_confidence_ellipse(parx_index, pary_index, nsigma=2)
+        plt.plot(*ellipse2, label=r"2σ")
 
         plt.legend()
         plt.tight_layout()
@@ -224,7 +224,7 @@ class LikelihoodFitter(ABC):
     # Plot a surface of the fit cost function
     # Two parameters must be selected
     # The first parameter is in x-axis and the second parameter in the y-axis
-    def plot_cost_function(self, parx_index, pary_index):
+    def plot_cost_function(self, parx_index, pary_index, parx_name=None, pary_name=None):
 
         # Confidence levels to include in the plot
         nsigma = 2
@@ -248,8 +248,8 @@ class LikelihoodFitter(ABC):
         # Plot
         fig = plt.figure(figsize=(5, 4))
         ax = fig.subplots(subplot_kw={"projection": "3d"})
-        ax.set_xlabel(f"Parameter {parx_index}")
-        ax.set_ylabel(f"Parameter {pary_index}")
+        ax.set_xlabel(parx_name)
+        ax.set_ylabel(pary_name)
         ax.set_zlabel(r"$-2\log(L/L_{max})$")
 
         # Levels of the countour lines
