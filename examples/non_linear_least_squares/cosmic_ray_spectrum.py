@@ -5,7 +5,7 @@ import numpy as np
 # Install likefit if not available with: pip -m install likefit
 import likefit
 
-# Data binned in $x = log_{10}(E/eV)$, y = number of cosmic rays in the energy bin
+# Data binned in $xdata = log_{10}(E/eV)$, ydata = number of cosmic rays in the energy bin
 xdata = np.linspace(18.45, 20.45, 21)
 ydata = np.array([13023, 7711, 4478, 3159, 2162, 1483, 1052, 699, 451, 323, 200, 110, 43, 28, 23, 5, 2, 0, 1, 0, 0])
 ysigma = np.sqrt(ydata)

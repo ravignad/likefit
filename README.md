@@ -33,7 +33,7 @@ ydata = np.array([0.92, 0.884, 0.626, 0.504, 0.481, 0.417, 0.288, 0.302, 0.177, 
 ysigma = np.array([0.1, 0.082, 0.067, 0.055, 0.045, 0.037, 0.03, 0.025, 0.02, 0.017, 0.014])
 
 
-# Fit model must be vectorized in x
+# Fit model must be vectorized in xdata
 def fit_model(x, par):
     return par[0] * np.exp(par[1] * x)
 
@@ -54,11 +54,11 @@ Plotting the fit and the error band
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
-ax.set_xlabel("x")
-ax.set_ylabel("y")
+ax.set_xlabel("xdata")
+ax.set_ylabel("ydata")
 
 # Plot data
-ax.errorbar(fitter.x, fitter.y, fitter.ysigma, ls='none', marker='o', label="Data")
+ax.errorbar(fitter.xdata, fitter.ydata, fitter.ydata_error, ls='none', marker='o', label="Data")
 
 # Plot fit
 xfit = np.linspace(start=xdata.min(), stop=xdata.max(), num=100)
@@ -117,7 +117,7 @@ nevents = np.array([0, 2, 5, 8, 7, 18, 15, 27, 34, 51, 55, 63, 67, 75, 90, 78, 7
                   4, 1, 0])
 
 
-# fit_model vectorized in x
+# fit_model vectorized in xdata
 def fit_model(x, par):
     return par[0] * norm.pdf(x, loc=par[1], scale=par[2])
 
@@ -142,7 +142,7 @@ ntrials = np.full(xdata.shape, 30)
 nsuccess = np.array([0, 0, 0, 3, 3, 2, 8, 5, 4, 11, 18, 15, 19, 20, 26, 24, 26, 29, 30, 30])
 
 
-# fit_model is sigmoid function vectorized in x
+# fit_model is sigmoid function vectorized in xdata
 def fit_model(x, par):
     return 1 / (1 + np.exp(-(x - par[0]) / par[1]))
 

@@ -8,7 +8,7 @@ ntrials = np.full(xdata.shape, 30)
 nsuccess = np.array([0, 0, 0, 3, 3, 2, 8, 5, 4, 11, 18, 15, 19, 20, 26, 24, 26, 29, 30, 30])
 
 
-# fit_model is sigmoid function vectorized in x
+# fit_model is sigmoid function vectorized in xdata
 def fit_model(x, par):
     return 1 / (1+np.exp(-(x-par[0])/par[1]))
 

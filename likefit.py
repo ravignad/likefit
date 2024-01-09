@@ -9,10 +9,16 @@ import matplotlib.pyplot as plt
 from matplotlib import cm, colors
 
 
+def normal_cost(ydata, yfit, ydata_error):
+    z_scores = (ydata - yfit) / ydata_error
+    return np.sum(z_scores**2)
+
+
+# Base class of all fitters
 class LikelihoodFitter(ABC):
 
     def __init__(self, x, model, par_names=None):
-        self.x = x
+        self.xdata = x
         self.model = model
         self.fit_result = None
         self.par_names = par_names
@@ -86,7 +92,7 @@ class LikelihoodFitter(ABC):
 
     def get_ndof(self):
         estimators = self.get_estimators()
-        ndof = len(self.x) - len(estimators)
+        ndof = len(self.xdata) - len(estimators)
         return ndof
 
     def get_pvalue(self):
@@ -124,12 +130,12 @@ class LikelihoodFitter(ABC):
 
     # Return an array with the difference between the data and the fit
     def get_residuals(self):
-        return self.get_ydata() - self.get_yfit(self.x)
+        return self.get_ydata() - self.get_yfit(self.xdata)
 
     # Numerical derivative of the model wrt the parameters evaluated at the estimators
     """
     Arguments:
-        x (np.array): values of the independent variable at which the gradient will be evaluated
+        xdata (np.array): values of the independent variable at which the gradient will be evaluated
     Return: 
         gradient (np.array):  2 dimensional array containing the calculated gradient. 
             The first dimension corresponds to the parameters and the second one to the values of 
@@ -176,15 +182,15 @@ class LikelihoodFitter(ABC):
     def plot_fit(self):
         # Plot
         fig, ax = plt.subplots()
-        ax.set_xlabel("x")
-        ax.set_ylabel("y")
+        ax.set_xlabel("xdata")
+        ax.set_ylabel("ydata")
 
         # Plot data
-        ax.errorbar(self.x, self.get_ydata(), self.get_ydata_errors(), ls='none', marker='o', label="Data")
+        ax.errorbar(self.xdata, self.get_ydata(), self.get_ydata_errors(), ls='none', marker='o', label="Data")
 
         # Plot fitter
-        xmin = self.x.min()
-        xmax = self.x.max()
+        xmin = self.xdata.min()
+        xmax = self.xdata.max()
         xfit = np.linspace(start=xmin, stop=xmax, num=100)
         yfit = self.get_yfit(xfit)
         ax.plot(xfit, yfit, ls='--', label="Fit")
@@ -201,7 +207,7 @@ class LikelihoodFitter(ABC):
     # Plot the 1σ and 2σ confidence ellipses
     # The ellipses are calculated from the covariance matrix of the estimators
     # Two parameters must be selected
-    # The first parameter is in x-axis and the second parameter in the y-axis
+    # The first parameter is in xdata-axis and the second parameter in the ydata-axis
     def plot_confidence_ellipses(self, parx_index, pary_index, parx_name=None, pary_name=None):
 
         # Plot
@@ -223,7 +229,7 @@ class LikelihoodFitter(ABC):
 
     # Plot a surface of the fit cost function
     # Two parameters must be selected
-    # The first parameter is in x-axis and the second parameter in the y-axis
+    # The first parameter is in xdata-axis and the second parameter in the ydata-axis
     # nsgima: number of nσ confidence levels to include in the plot
     def plot_cost_function(self, parx_index, pary_index, parx_name=None, pary_name=None, nsigma=2):
 
@@ -264,7 +270,7 @@ class LikelihoodFitter(ABC):
 
     # Plot a the contour levels of the fit cost function
     # Two parameters must be selected
-    # The first parameter is in x-axis and the second parameter in the y-axis
+    # The first parameter is in xdata-axis and the second parameter in the ydata-axis
     # nsgima: number of nσ confidence levels to plot
     def plot_confidence_regions(self, parx_index, pary_index, parx_name=None, pary_name=None, nsigma=2):
         # Calculate coordinates of the points to plot
@@ -301,7 +307,7 @@ class LikelihoodFitter(ABC):
         clb = plt.colorbar()
         clb.ax.set_title(r"$n\sigma$")
 
-        # contours = ax.contourf(x, y, np.sqrt(z), levels=sigma_levels, cmap='Blues_r')
+        # contours = ax.contourf(xdata, ydata, np.sqrt(z), levels=sigma_levels, cmap='Blues_r')
         # clb = fig.colorbar(contours)
         # clb.ax.set_title(r"$n\sigma$")
 
@@ -311,10 +317,10 @@ class LikelihoodFitter(ABC):
 
 class LinearLeastSquares(LikelihoodFitter):
 
-    def __init__(self, x, y, ysigma, npar, model):
-        LikelihoodFitter.__init__(self, x, model)
-        self.y = y
-        self.ysigma = ysigma
+    def __init__(self, xdata, ydata, ydata_error, npar, model):
+        LikelihoodFitter.__init__(self, xdata, model)
+        self.ydata = ydata
+        self.ydata_error = ydata_error
         self.npar = npar
         self.__set_model_matrix()
 
@@ -324,30 +330,28 @@ class LinearLeastSquares(LikelihoodFitter):
         for pari in range(self.npar):
             unit_vector = np.zeros(shape=self.npar)
             unit_vector[pari] = 1
-            matrix_column = self.model(self.x, unit_vector)
+            matrix_column = self.model(self.xdata, unit_vector)
             column_list.append(matrix_column)
 
         self.model_matrix = np.array(column_list)
 
     def cost_function(self, par):
-        mu = self.model(self.x, par)
-        residuals = (self.y - mu) / self.ysigma
-        cost = np.sum(residuals**2)
-        return cost
+        yfit = self.model(self.xdata, par)
+        return normal_cost(self.ydata, yfit, self.ydata_error)
 
     def fit(self):
-        inv_var_y = self.ysigma**(-2)
+        inv_var_y = self.ydata_error ** (-2)
         inv_cova_par = np.einsum('ij,j,lj', self.model_matrix, inv_var_y, self.model_matrix)
         self.cova_par = np.linalg.inv(inv_cova_par)
         matrix_b = np.einsum('ij,jk,k -> ik', self.cova_par, self.model_matrix, inv_var_y)
-        self.estimators = np.einsum('ij,j', matrix_b, self.y)
+        self.estimators = np.einsum('ij,j', matrix_b, self.ydata)
 
     def get_covariance_matrix(self):
         return self.cova_par
 
     def get_deviance(self):
-        residuals = self.y - self.get_yfit(self.x)
-        z_array = residuals/self.ysigma
+        residuals = self.ydata - self.get_yfit(self.xdata)
+        z_array = residuals/self.ydata_error
         chi2_min = np.sum(z_array**2)
         return chi2_min
 
@@ -355,56 +359,54 @@ class LinearLeastSquares(LikelihoodFitter):
         return self.estimators
 
     def get_ydata(self):
-        return self.y
+        return self.ydata
 
     def get_ydata_errors(self):
-        return self.ysigma
+        return self.ydata_error
 
 
 class NonLinearLeastSquares(LikelihoodFitter):
 
-    def __init__(self, x, y, ysigma, model):
-        LikelihoodFitter.__init__(self, x, model)
-        self.y = y
-        self.ysigma = ysigma
+    def __init__(self, xdata, ydata, ydata_error, model):
+        LikelihoodFitter.__init__(self, xdata, model)
+        self.ydata = ydata
+        self.ydata_error = ydata_error
 
     def cost_function(self, par):
-        mu = self.model(self.x, par)
-        residuals = (self.y - mu) / self.ysigma
-        cost = np.sum(residuals**2)
-        return cost
+        yfit = self.model(self.xdata, par)
+        return normal_cost(self.ydata, yfit, self.ydata_error)
 
     def get_ydata(self):
-        return self.y
+        return self.ydata
 
     def get_ydata_errors(self):
-        return self.ysigma
+        return self.ydata_error
 
 
 class Poisson(LikelihoodFitter):
 
-    def __init__(self, x, nevents, model):
-        LikelihoodFitter.__init__(self, x, model)
+    def __init__(self, xdata, nevents, model):
+        LikelihoodFitter.__init__(self, xdata, model)
         self.nevents = nevents
 
     # Poisson cost function
     def cost_function(self, par):
 
-        mu = self.model(self.x, par)
+        mu = self.model(self.xdata, par)
 
         """
-            Piecewise-defined  function for cases y=0 and y!=0
+            Piecewise-defined  function for cases ydata=0 and ydata!=0
             Note: scipy.stats.rv_discrete contains a negative log likelihood that does not work well.
             So we implement the cost function from scratch 
         """
 
-        # Select data points y=0
+        # Select data points ydata=0
         zero_mask = (self.nevents == 0)
         mu1 = np.ma.array(mu, mask=~zero_mask)
         likelihood_ratio1 = -mu1
         cost1 = -2 * likelihood_ratio1.sum()
 
-        # Select data points y!=0
+        # Select data points ydata!=0
         nevents2 = np.ma.array(self.nevents, mask=zero_mask)
         mu2 = np.ma.array(mu, mask=zero_mask)
         likelihood_ratio2 = nevents2 * np.log(mu2 / nevents2) - (mu2 - nevents2)
@@ -432,8 +434,8 @@ class Binomial(LikelihoodFitter):
     # Binomial cost function
     def cost_function(self, par):
 
-        # Bernoulli probability for each x according to the model
-        proba = self.model(self.x, par)
+        # Bernoulli probability for each xdata according to the model
+        proba = self.model(self.xdata, par)
 
         # Maximum likelihood estimator of the Bernoulli probability
         proba_mle = self.nsuccess / self.ntrials
@@ -477,5 +479,5 @@ class Binomial(LikelihoodFitter):
     # Approximated binomial errors, not valid when nsuccess~0 or nsuccess~ntrials
     def get_ydata_errors(self):
         proba_mle = self.get_ydata()
-        ydata_variance = self.ntrials * proba_mle * (1-proba_mle)
+        ydata_variance =  proba_mle * (1-proba_mle) / self.ntrials
         return np.sqrt(ydata_variance)

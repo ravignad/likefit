@@ -8,7 +8,7 @@ ydata = np.array([0.92, 0.884, 0.626, 0.504, 0.481, 0.417, 0.288, 0.302, 0.177, 
 ysigma = np.array([0.1, 0.082, 0.067, 0.055, 0.045, 0.037, 0.03, 0.025, 0.02, 0.017, 0.014])
 
 
-# fit_model vectorized in x
+# fit_model vectorized in xdata
 def fit_model(x, par):
     return par[0] * np.exp(par[1] * x)
 

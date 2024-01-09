@@ -10,7 +10,7 @@ nevents = np.array([0, 2, 5, 8, 7, 18, 15, 27, 34, 51, 55, 63, 67, 75, 90, 78, 7
                     5, 4, 1, 0])
 
 
-# fit_model vectorized in x
+# fit_model vectorized in xdata
 def fit_model(x, par):
     return par[0] * norm.pdf(x, loc=par[1], scale=par[2])
 
