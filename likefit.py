@@ -17,15 +17,27 @@ def normal_cost(ydata, yfit, ydata_error):
 
 def poisson_cost(mu, nevents):
     """
+    Calculates the Poisson costs for data poins
+
+    Args:
+        mu (np.ndarray): The mu parameter of the Poisson distribution for each data point
+        nevents (float or np.ndarray): The number of observed events for each data point
+
+    Returns:
+        np.ndarray: Cost of each data point
+    """
+
+    cost = np.zeros_like(mu)
+    # If the number of events is a float fill an array with them
+    nevents_array = np.asarray(nevents, like=mu)
+
+    """
         Piecewise-defined  function for cases ydata=0 and ydata!=0
         Note: scipy.stats.rv_discrete contains a negative log likelihood that does not work well.
         So we implement the cost function from scratch
     """
-
-    cost = np.zeros_like(mu)
-
     # Select data points ydata=0
-    zero_mask = (nevents == 0)
+    zero_mask = (nevents_array == 0)
     mu1 = mu[zero_mask]
     likelihood_ratio1 = -mu1
     cost1 = -2 * likelihood_ratio1
@@ -33,7 +45,7 @@ def poisson_cost(mu, nevents):
 
     # Select data points ydata!=0
     mu2 = mu[~zero_mask]
-    nevents2 = nevents[~zero_mask]
+    nevents2 = nevents_array[~zero_mask]
     likelihood_ratio2 = nevents2 * np.log(mu2 / nevents2) - (mu2 - nevents2)
     cost2 = -2 * likelihood_ratio2
     cost[~zero_mask] += cost2
