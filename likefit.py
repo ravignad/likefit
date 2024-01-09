@@ -22,7 +22,6 @@ def poisson_cost(mu, nevents):
         So we implement the cost function from scratch
     """
 
-    likelihood_ratio = np.zeros_like(mu)
     cost = np.zeros_like(mu)
 
     # Select data points ydata=0
@@ -42,11 +41,7 @@ def poisson_cost(mu, nevents):
     return cost
 
 
-def binomial_cost(nsuccess, ntrials, proba):
-
-    # Maximum likelihood estimator of the Bernoulli probability
-    proba_mle = nsuccess / ntrials
-
+def binomial_cost(proba, nsuccess, ntrials):
     """
     Piecewise-defined function for cases:
         1) nsuccess=0
@@ -54,30 +49,37 @@ def binomial_cost(nsuccess, ntrials, proba):
         3) nsuccess=ntrials
     """
 
+    cost = np.zeros_like(proba)
+
+    # Maximum likelihood estimator of the Bernoulli probability
+    proba_mle = nsuccess / ntrials
+
     # Case nsuccess = 0
     zero_mask = nsuccess == 0
-    proba1 = np.ma.array(proba, mask=~zero_mask)
-    ntrials1 = np.ma.array(ntrials, mask=~zero_mask)
+    proba1 = proba[zero_mask]
+    ntrials1 = ntrials[zero_mask]
     likelihood_ratio1 = ntrials1 * np.log(1 - proba1)
     cost1 = -2 * likelihood_ratio1.sum()
+    cost[zero_mask] += cost1
 
     # Case 0 < nsuccess < ntrials
     intermediate_mask = np.logical_and(0 < nsuccess, nsuccess < ntrials)
-    proba2 = np.ma.array(proba, mask=~intermediate_mask)
-    ntrials2 = np.ma.array(ntrials, mask=~intermediate_mask)
-    proba_mle2 = np.ma.array(proba_mle, mask=~intermediate_mask)
+    proba2 = proba[intermediate_mask]
+    ntrials2 = ntrials[intermediate_mask]
+    proba_mle2 = proba_mle[intermediate_mask]
     likelihood_ratio2 = ntrials2 * (proba_mle2 * np.log(proba2 / proba_mle2)
                                     + (1 - proba_mle2) * np.log((1 - proba2) / (1 - proba_mle2)))
     cost2 = -2 * likelihood_ratio2.sum()
+    cost[intermediate_mask] += cost2
 
     # Case nsuccess = ntrials
     ntrials_mask = nsuccess == ntrials
-    proba3 = np.ma.array(proba, mask=~ntrials_mask)
-    ntrials3 = np.ma.array(ntrials, mask=~ntrials_mask)
+    proba3 = proba[ntrials_mask]
+    ntrials3 = ntrials[ntrials_mask]
     likelihood_ratio3 = ntrials3 * np.log(proba3)
     cost3 = -2 * likelihood_ratio3.sum()
+    cost[ntrials_mask] += cost3
 
-    cost = cost1 + cost2 + cost3
     return cost
 
 
@@ -481,7 +483,8 @@ class Binomial(LikelihoodFitter):
     def cost_function(self, par):
         # Bernoulli probability for each xdata according to the model
         yfit = self.model(self.xdata, par)
-        return binomial_cost(self.nsuccess, self.ntrials, yfit)
+        data_point_costs = binomial_cost(yfit, self.nsuccess, self.ntrials)
+        return data_point_costs.sum()
 
     def get_ydata(self):
         return self.nsuccess / self.ntrials
