@@ -223,8 +223,8 @@ class LikelihoodFitter(ABC):
 
     # Plot a surface of the fit cost function
     # Two parameters must be selected
-    # The first parameter is in x-axis and the second parameter in the y-axisç
-    # nsgima: number of nσ confidence levels to plot
+    # The first parameter is in x-axis and the second parameter in the y-axis
+    # nsgima: number of nσ confidence levels to include in the plot
     def plot_cost_function(self, parx_index, pary_index, parx_name=None, pary_name=None, nsigma=2):
 
         # Calculate coordinates of the points to plot
@@ -260,6 +260,52 @@ class LikelihoodFitter(ABC):
         clb = plt.colorbar(surf, shrink=0.5, location='left')
         clb.ax.set_title(r"$\sigma^2$")
 
+        plt.show()
+
+    # Plot a the contour levels of the fit cost function
+    # Two parameters must be selected
+    # The first parameter is in x-axis and the second parameter in the y-axis
+    # nsgima: number of nσ confidence levels to plot
+    def plot_confidence_regions(self, parx_index, pary_index, parx_name=None, pary_name=None, nsigma=2):
+        # Calculate coordinates of the points to plot
+        estimators = self.get_estimators()
+        errors = self.get_errors()
+
+        parx_min = estimators[parx_index] - (nsigma+1) * errors[parx_index]
+        parx_max = estimators[parx_index] + (nsigma+1) * errors[parx_index]
+        parx = np.linspace(parx_min, parx_max, num=50)
+
+        pary_min = estimators[pary_index] - (nsigma+1) * errors[pary_index]
+        pary_max = estimators[pary_index] + (nsigma+1) * errors[pary_index]
+        pary = np.linspace(pary_min, pary_max, num=50)
+
+        x, y = np.meshgrid(parx, pary)
+        cost = self.vcost_function(parx_index, pary_index, parx, pary)
+        z = np.sqrt(cost - cost.min())
+
+        # Plot
+        fig, ax = plt.subplots()
+        ax.set_xlabel(parx_name)
+        ax.set_ylabel(pary_name)
+
+        # Levels of the contour lines
+        sigma_levels = np.arange(0, nsigma+1)
+        contours = ax.contour(x, y, z, levels=sigma_levels, colors='black', linestyles='dashed')
+
+        def fmt(x):
+            return f"{x:.0f}σ"
+
+        ax.clabel(contours, contours.levels, fmt=fmt, inline=True)
+
+        plt.pcolormesh(x, y, z, shading='auto', cmap=plt.cm.viridis_r)
+        clb = plt.colorbar()
+        clb.ax.set_title(r"$n\sigma$")
+
+        # contours = ax.contourf(x, y, np.sqrt(z), levels=sigma_levels, cmap='Blues_r')
+        # clb = fig.colorbar(contours)
+        # clb.ax.set_title(r"$n\sigma$")
+
+        plt.tight_layout()
         plt.show()
 
 
