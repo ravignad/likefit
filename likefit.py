@@ -430,7 +430,7 @@ class Binomial(LikelihoodFitter):
     def get_ydata(self):
         return self.nsuccess / self.ntrials
 
-    # Approximated binomial errors, not valid when nsucces~0 or nsuccess~ntrials
+    # Approximated binomial errors, not valid when nsuccess~0 or nsuccess~ntrials
     def get_ydata_errors(self):
         proba_mle = self.get_ydata()
         ydata_variance = self.ntrials * proba_mle * (1-proba_mle)
