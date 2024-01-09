@@ -27,7 +27,7 @@ fitter.print_results()
 fitter.plot_fit()
 
 # Plot the confidence ellipses
-fitter.plot_confidence_ellipses(parx_index=0, pary_index=1)
+fitter.plot_confidence_ellipses(parx_index=0, pary_index=1, parx_name="y0", pary_name="m")
 
 # Plot the cost function
 fitter.plot_cost_function(parx_index=0, pary_index=1, parx_name="y0", pary_name="m")

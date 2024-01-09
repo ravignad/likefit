@@ -202,12 +202,12 @@ class LikelihoodFitter(ABC):
     # The ellipses are calculated from the covariance matrix of the estimators
     # Two parameters must be selected
     # The first parameter is in x-axis and the second parameter in the y-axis
-    def plot_confidence_ellipses(self, parx_index, pary_index):
+    def plot_confidence_ellipses(self, parx_index, pary_index, parx_name=None, pary_name=None):
 
         # Plot
         fig, ax = plt.subplots()
-        ax.set_xlabel(f"Parameter {parx_index}")
-        ax.set_ylabel(f"Parameter {pary_index}")
+        ax.set_xlabel(parx_name)
+        ax.set_ylabel(pary_name)
 
         estimators = self.get_estimators()
         plt.plot(estimators[parx_index], estimators[pary_index], 'o', label="Estimator")
