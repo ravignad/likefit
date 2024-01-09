@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm, colors
 
 
-class LikelihoodFit(ABC):
+class LikelihoodFitter(ABC):
 
     def __init__(self, x, model, par_names=None):
         self.x = x
@@ -265,10 +265,10 @@ class LikelihoodFit(ABC):
         plt.show()
 
 
-class LinearLeastSquares(LikelihoodFit):
+class LinearLeastSquares(LikelihoodFitter):
 
     def __init__(self, x, y, ysigma, npar, model):
-        LikelihoodFit.__init__(self, x, model)
+        LikelihoodFitter.__init__(self, x, model)
         self.y = y
         self.ysigma = ysigma
         self.npar = npar
@@ -317,10 +317,10 @@ class LinearLeastSquares(LikelihoodFit):
         return self.ysigma
 
 
-class NonLinearLeastSquares(LikelihoodFit):
+class NonLinearLeastSquares(LikelihoodFitter):
 
     def __init__(self, x, y, ysigma, model):
-        LikelihoodFit.__init__(self, x, model)
+        LikelihoodFitter.__init__(self, x, model)
         self.y = y
         self.ysigma = ysigma
 
@@ -337,10 +337,10 @@ class NonLinearLeastSquares(LikelihoodFit):
         return self.ysigma
 
 
-class Poisson(LikelihoodFit):
+class Poisson(LikelihoodFitter):
 
     def __init__(self, x, nevents, model):
-        LikelihoodFit.__init__(self, x, model)
+        LikelihoodFitter.__init__(self, x, model)
         self.nevents = nevents
 
     # Poisson cost function
@@ -378,10 +378,10 @@ class Poisson(LikelihoodFit):
         return np.sqrt(self.nevents)
 
 
-class Binomial(LikelihoodFit):
+class Binomial(LikelihoodFitter):
 
     def __init__(self, x, ntrials, nsuccess, model):
-        LikelihoodFit.__init__(self, x, model)
+        LikelihoodFitter.__init__(self, x, model)
         self.ntrials = ntrials
         self.nsuccess = nsuccess
 
