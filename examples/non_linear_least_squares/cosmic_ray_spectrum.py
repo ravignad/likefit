@@ -3,7 +3,6 @@
 import numpy as np
 
 # Install likefit if not available with: pip -m install likefit
-
 import likefit
 
 # Data binned in $x = log_{10}(E/eV)$, y = number of cosmic rays in the energy bin
@@ -18,18 +17,20 @@ yfit_sigma = ysigma[3:11]
 
 
 # Fit model
-def fit_model(x, theta):
-    return np.power(10, theta[0]-theta[1]*(x-19))
+def fit_model(x, par):
+    return np.power(10, par[0]-par[1]*(x-19))
 
 
 # Fit data
 fitter = likefit.NonLinearLeastSquares(xfit, yfit, yfit_sigma, fit_model)
 seed = np.array([3, 2])
+
+# Reduce the tolerance to converge the minimization
 fitter.fit(seed, tol=1e-3)
 fitter.print_results()
 
 # Plot data and fit
 fitter.plot_fit()
 
-# Plot the 1σ and 2σ confidence ellipses
-fitter.plot_confidence_ellipses(parx_index=0, pary_index=1)
+# Plot the 1σ, 2σ, and 3σ confidence regions
+fitter.plot_confidence_regions(parx_index=0, pary_index=1, parx_name="a", pary_name="b", nsigma=3)
