@@ -252,7 +252,7 @@ class LikelihoodFitter(ABC):
         ax.set_ylabel(pary_name)
         ax.set_zlabel(r"$-2\log(L/L_{max})$")
 
-        # Levels of the countour lines
+        # Levels of the contour lines
         sigma_levels = np.arange(0, 7)
         bounds = sigma_levels ** 2
         norm = colors.BoundaryNorm(boundaries=bounds, ncolors=128)
