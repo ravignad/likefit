@@ -36,8 +36,9 @@ class LikelihoodFit(ABC):
         vcost = np.reshape(vcost, newshape=(len(pary), len(parx)))
         return vcost
 
-    def fit(self, seed):
-        self.fit_result = minimize(self.cost_function, x0=seed)
+    # kwargs passed to scipy.optimize.minimize to control the minimization
+    def fit(self, seed, **kwargs):
+        self.fit_result = minimize(self.cost_function, x0=seed, **kwargs)
 
         if not self.fit_result.success:
             print(self.fit_result)
