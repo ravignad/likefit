@@ -12,7 +12,7 @@ from matplotlib import cm, colors
 # Cost functions of the dependent variable y
 def normal_cost(ydata, yfit, ydata_error):
     z_scores = (ydata - yfit) / ydata_error
-    return np.sum(z_scores**2)
+    return z_scores**2
 
 
 def poisson_cost(mu, nevents):
@@ -406,7 +406,8 @@ class LinearLeastSquares(LikelihoodFitter):
 
     def cost_function(self, par):
         yfit = self.model(self.xdata, par)
-        return normal_cost(self.ydata, yfit, self.ydata_error)
+        data_point_costs = normal_cost(self.ydata, yfit, self.ydata_error)
+        return data_point_costs.sum()
 
     def fit(self):
         inv_var_y = self.ydata_error ** (-2)
@@ -443,7 +444,8 @@ class NonLinearLeastSquares(LikelihoodFitter):
 
     def cost_function(self, par):
         yfit = self.model(self.xdata, par)
-        return normal_cost(self.ydata, yfit, self.ydata_error)
+        data_point_costs = normal_cost(self.ydata, yfit, self.ydata_error)
+        return data_point_costs.sum()
 
     def get_ydata(self):
         return self.ydata
