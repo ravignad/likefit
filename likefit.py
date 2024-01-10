@@ -260,11 +260,11 @@ class LikelihoodFitter(ABC):
         print(f"Degrees of freedom: {self.get_ndof()}")
         print(f"Pvalue: {self.get_pvalue()}")
 
-    def plot_fit(self):
+    def plot_fit(self, xlabel="x", ylabel="y"):
         # Plot
         fig, ax = plt.subplots()
-        ax.set_xlabel("xdata")
-        ax.set_ylabel("ydata")
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
         # Plot data
         ax.errorbar(self.xdata, self.get_ydata(), self.get_ydata_errors(), ls='none', marker='o', label="Data")
