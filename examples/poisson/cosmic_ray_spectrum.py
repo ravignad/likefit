@@ -33,4 +33,4 @@ fitter.print_results()
 fitter.plot_fit(xlabel=r"$\log_{10}(E/eV)$", ylabel="Events")
 
 # Plot the 1σ, 2σ, and 3σ confidence regions
-fitter.plot_confidence_regions(parx_index=0, pary_index=1, parx_name="a", pary_name="b", nsigma=3)
+fitter.plot_confidence_regions(parx_index=0, pary_index=1, xlabel="a", ylabel="b", nsigma=3)

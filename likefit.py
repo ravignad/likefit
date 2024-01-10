@@ -289,12 +289,12 @@ class LikelihoodFitter(ABC):
     # The ellipses are calculated from the covariance matrix of the estimators
     # Two parameters must be selected
     # The first parameter is in xdata-axis and the second parameter in the ydata-axis
-    def plot_confidence_ellipses(self, parx_index, pary_index, parx_name=None, pary_name=None):
+    def plot_confidence_ellipses(self, parx_index, pary_index, xlabel=None, ylabel=None):
 
         # Plot
         fig, ax = plt.subplots()
-        ax.set_xlabel(parx_name)
-        ax.set_ylabel(pary_name)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
         estimators = self.get_estimators()
         plt.plot(estimators[parx_index], estimators[pary_index], 'o', label="Estimator")
@@ -312,7 +312,7 @@ class LikelihoodFitter(ABC):
     # Two parameters must be selected
     # The first parameter is in xdata-axis and the second parameter in the ydata-axis
     # nsgima: number of nσ confidence levels to include in the plot
-    def plot_cost_function(self, parx_index, pary_index, parx_name=None, pary_name=None, nsigma=2):
+    def plot_cost_function(self, parx_index, pary_index, xlabel=None, ylabel=None, nsigma=2):
 
         # Calculate coordinates of the points to plot
         estimators = self.get_estimators()
@@ -333,8 +333,8 @@ class LikelihoodFitter(ABC):
         # Plot
         fig = plt.figure(figsize=(5, 4))
         ax = fig.subplots(subplot_kw={"projection": "3d"})
-        ax.set_xlabel(parx_name)
-        ax.set_ylabel(pary_name)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
         ax.set_zlabel(r"$-2\log(L/L_{max})$")
 
         # Levels of the contour lines
@@ -353,7 +353,7 @@ class LikelihoodFitter(ABC):
     # Two parameters must be selected
     # The first parameter is in xdata-axis and the second parameter in the ydata-axis
     # nsgima: number of nσ confidence levels to plot
-    def plot_confidence_regions(self, parx_index, pary_index, parx_name=None, pary_name=None, nsigma=2):
+    def plot_confidence_regions(self, parx_index, pary_index, xlabel=None, ylabel=None, nsigma=2):
         # Calculate coordinates of the points to plot
         estimators = self.get_estimators()
         errors = self.get_errors()
@@ -372,8 +372,8 @@ class LikelihoodFitter(ABC):
 
         # Plot
         fig, ax = plt.subplots()
-        ax.set_xlabel(parx_name)
-        ax.set_ylabel(pary_name)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
         # Levels of the contour lines
         sigma_levels = np.arange(0, nsigma+1)
