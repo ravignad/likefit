@@ -252,6 +252,7 @@ class LikelihoodFitter(ABC):
         return gradient
 
     def print_results(self):
+        print("Fit summary")
         print(f"Estimators: {self.get_estimators()}")
         print(f"Errors: {self.get_errors()}")
         print(f"Covariance matrix: {self.get_covariance_matrix()}")
