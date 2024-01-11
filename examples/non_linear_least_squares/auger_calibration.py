@@ -1,5 +1,5 @@
 # A simplified energy calibration of the Auger surface detector
-# Data taken from Auger Open Data (10.5281/zenodo.4487612)
+# Data taken from Pierre Auger Collaboration, Auger Open Data, doi:10.5281/zenodo.4487612
 
 import numpy as np
 import pandas as pd
