@@ -17,7 +17,7 @@ def normal_cost(mu, ydata, ydata_error):
 
 def poisson_cost(mu, nevents):
     """
-    Calculates the Poisson costs for data poins
+    Calculates the Poisson costs for data points
 
     Args:
         mu (np.ndarray): The mu parameter of the Poisson distribution for each data point
