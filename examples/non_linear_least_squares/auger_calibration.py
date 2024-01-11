@@ -26,6 +26,7 @@ def fit_model(energy, par):
     power_law_index = par[1]
     return size_0 * np.power(energy / energy_0, 1 / power_law_index)
 
+
 '''
     By the selection of the energy as the x variable and the shower size as y variable, 
     the fit model is the inverse of the calibration function
@@ -35,7 +36,7 @@ def fit_model(energy, par):
 # and the shower size assigned to the y variable follows a normal distribution
 fitter = likefit.NonLinearLeastSquares(xdata, ydata, yerror, fit_model)
 
-# The convergence of the fit depends heavily on choosing a see close to the minimum
+# The convergence of the fit depends heavily on choosing a seed close to the minimum
 seed = np.array([7, 1])
 fitter.fit(seed)
 fitter.print_results()
