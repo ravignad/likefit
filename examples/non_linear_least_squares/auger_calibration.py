@@ -1,5 +1,5 @@
 # A simplified energy calibration of the Auger surface detector
-# Data taken from Pierre Auger Collaboration, Auger Open Data, doi:10.5281/zenodo.4487612
+# Data taken from Pierre Auger Collaboration, Auger Open Data, DOI:10.5281/zenodo.4487612
 
 import numpy as np
 import pandas as pd
@@ -41,7 +41,7 @@ fitter.fit(seed)
 fitter.print_results()
 
 # Plot the data and the fit
-fitter.plot_fit(xlabel="Energy", ylabel="Shower size")
+fitter.plot_fit(xlabel="Energy (EeV)", ylabel="Shower size (VEM)")
 
 # Plot the 1σ and 2σ confidence regions
 fitter.plot_confidence_regions(parx_index=0, pary_index=1, xlabel="${E}_0$ (EeV)", ylabel="B")
