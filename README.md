@@ -1,7 +1,7 @@
 # LikeFit
 
 LikeFit is an open-source library to fit data in science and engineering. 
-It provides a simple yet complete interface to SciPy that performs linear and nolinear least squares and other likelihood fits. 
+It provides a simple yet complete interface to perform linear and nonlinear least squares and other likelihood fits. 
 
 ## Install
 
@@ -12,10 +12,9 @@ python -m pip install likefit
 ## Features
   * Linear and nonlinear least squares fits
   * Poisson likelihood to fit histograms
-  * Binomial likelihood 
   * Calculation of estimators, errors, and correlations
   * Evaluation of goodness-of-fit with chi-squared test
-  * Support for plotting error bands, confidence ellipses, and likelihood functions
+  * Plotting of error bands, confidence regions, and likelihood functions
 
 ## How to use
 
@@ -142,7 +141,7 @@ ntrials = np.full(xdata.shape, 30)
 nsuccess = np.array([0, 0, 0, 3, 3, 2, 8, 5, 4, 11, 18, 15, 19, 20, 26, 24, 26, 29, 30, 30])
 
 
-# fit_model is sigmoid function vectorized in xdata
+# fit_model is a sigmoid function vectorized in xdata
 def fit_model(x, par):
     return 1 / (1 + np.exp(-(x - par[0]) / par[1]))
 
