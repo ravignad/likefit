@@ -6,7 +6,6 @@ import likefit
 xdata = np.array([-0.18, -0.14, -0.1, -0.06, -0.02,  0.02,  0.06,  0.1,  0.14])
 ydata = np.array([2.243, 2.217, 2.201, 2.175, 2.132, 2.116, 2.083, 2.016, 2.004])
 ysigma = np.array([0.008, 0.008, 0.01, 0.009, 0.011, 0.016, 0.018, 0.021, 0.017])
-npar = 2
 
 
 # Model linear in the parameters
@@ -15,7 +14,7 @@ def fit_model(x, par):
 
 
 # Create the fitter
-fitter = likefit.LinearLeastSquares(xdata, ydata, ysigma, npar, fit_model)
+fitter = likefit.LinearLeastSquares(xdata, ydata, ysigma, fit_model)
 
 # Fit the data
 fitter.fit()

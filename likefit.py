@@ -399,18 +399,35 @@ class LikelihoodFitter(ABC):
 
 class LinearLeastSquares(LikelihoodFitter):
 
-    def __init__(self, xdata, ydata, ydata_error, npar, model):
+    def __init__(self, xdata, ydata, ydata_error, model):
         LikelihoodFitter.__init__(self, xdata, model)
         self.ydata = ydata
         self.ydata_error = ydata_error
-        self.npar = npar
-        self.__set_model_matrix()
+        npar = self.__count_parameters()
+        self.__set_model_matrix(npar)
 
-    def __set_model_matrix(self):
+
+    # Dirty way to count the number of fit parameters forcing an IndexError exception until reaching the number of parameters
+    def __count_parameters(self):
+        npar = 0
+        par = np.array([1])
+        
+        while True:
+            try:
+                self.model(self.xdata, par)
+            except IndexError:
+                npar += 1
+                par = np.zeros(npar)
+                par[-1]=1
+            else:
+                break
+        
+        return npar
+
+    def __set_model_matrix(self, npar):
         column_list = []
-
-        for pari in range(self.npar):
-            unit_vector = np.zeros(shape=self.npar)
+        for pari in range(npar):
+            unit_vector = np.zeros(shape=npar)
             unit_vector[pari] = 1
             matrix_column = self.model(self.xdata, unit_vector)
             column_list.append(matrix_column)
