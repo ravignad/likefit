@@ -1,7 +1,8 @@
 # LikeFit
 
-LikeFit is an open-source library to fit data in science and engineering. 
-It provides a simple yet complete interface to perform linear and nonlinear least squares and other likelihood fits. 
+LikeFit is a library to fit data for science and engineering. 
+It provides a simple yet comprehensive interface to perform linear and nonlinear least squares and other likelihood fits.
+
 
 ## Install
 
@@ -10,8 +11,8 @@ python -m pip install likefit
 ```
 
 ## Features
-  * Linear and nonlinear least squares fits
-  * Poisson likelihood to fit histograms
+  * Linear and nonlinear least squares fits with a consistent interface
+  * Fit of histograms with a Poisson likelihood
   * Calculation of estimators, errors, and correlations
   * Evaluation of goodness-of-fit with chi-squared test
   * Plotting of error bands, confidence regions, and likelihood functions
