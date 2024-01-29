@@ -10,21 +10,44 @@ from matplotlib import cm, colors
 
 
 # Cost functions of the dependent variable y
-def normal_cost(mu, ydata, ydata_error):
+def normal_cost(mu: np.ndarray, ydata: np.ndarray, ydata_error: np.ndarray) -> np.ndarray:
+    """
+    Calculate the squared z-scores for a normal distribution.
+
+    Parameters
+    ----------
+    mu : numpy.ndarray
+        Array of the means of the normal distribution.
+    ydata : numpy.ndarray
+        Array of observed data points.
+    ydata_error : numpy.ndarray
+        Array of error or uncertainty associated with each data point.
+
+    Returns
+    -------
+    numpy.ndarray
+        Array of squared z-scores for each data point.
+    """
+    
     z_scores = (ydata - mu) / ydata_error
     return z_scores**2
 
 
-def poisson_cost(mu, nevents):
+def poisson_cost(mu: np.ndarray, nevents: np.ndarray) -> np.ndarray:
     """
-    Calculates the Poisson costs for data points
+    Calculate the Poisson costs for each data point.
 
-    Args:
-        mu (np.ndarray): The mu parameter of the Poisson distribution for each data point
-        nevents (float or np.ndarray): The number of observed events for each data point
+    Parameters
+    ----------
+    mu : numpy.ndarray
+        The mean parameter of the Poisson distribution for each data point.
+    nevents : float or numpy.ndarray
+        The number of observed events for each data point.
 
-    Returns:
-        np.ndarray: Cost of each data point
+    Returns
+    -------
+    numpy.ndarray
+        Cost of each data point.
     """
 
     cost = np.zeros_like(mu)
@@ -36,6 +59,7 @@ def poisson_cost(mu, nevents):
         Note: scipy.stats.rv_discrete contains a negative log likelihood that does not work well.
         So we implement the cost function from scratch
     """
+    
     # Select data points ydata=0
     zero_mask = (nevents_array == 0)
     mu1 = mu[zero_mask]
@@ -53,9 +77,27 @@ def poisson_cost(mu, nevents):
     return cost
 
 
-def binomial_cost(proba, nsuccess, ntrials):
+def binomial_cost(proba: np.ndarray, nsuccess: np.ndarray, ntrials: np.ndarray) -> np.ndarray:
     """
-    Piecewise-defined function for cases:
+    Calculate the binomial costs for each data point.
+
+    Parameters
+    ----------
+    proba : np.ndarray
+        Array of success probabilities for each data point.
+    nsuccess : np.ndarray
+        Array of the number of successes for each data point.
+    ntrials : np.ndarray
+        Array of the number of trials for each data point.
+
+    Returns
+    -------
+    np.ndarray
+        Binomial costs for each data point.
+    """
+
+    """
+    The function is defined piecewise for the following cases:
         1) nsuccess=0
         2) 0 < nsuccess < ntrials
         3) nsuccess=ntrials
@@ -97,19 +139,69 @@ def binomial_cost(proba, nsuccess, ntrials):
 
 # Base class of all fitters
 class LikelihoodFitter(ABC):
+    """
+    Base class for likelihood-based fitters.
 
-    def __init__(self, x, model, par_names=None):
+    Parameters
+    ----------
+    x : array_like
+        The independent variable data.
+    model : callable
+        The model function to fit the data.
+
+
+    Attributes
+    ----------
+    xdata : array_like
+        The independent variable data.
+    model : callable
+        The model function to fit the data.
+    fit_result : scipy.optimize.OptimizeResult, optional
+        Result of the fitting process.
+    """
+
+    def __init__(self, x, model):
         self.xdata = x
         self.model = model
         self.fit_result = None
-        self.par_names = par_names
 
     @abstractmethod
     def cost_function(self, par):
+        """
+        Abstract method to define the cost function for the optimization process.
+
+        Parameters
+        ----------
+        par : array_like
+            The parameter values.
+
+        Returns
+        -------
+        float
+            The value of the cost function for the given parameters.
+        """
         pass
 
-    # Vectorized version of the cost function useful for plotting
     def vcost_function(self, parx_index, pary_index, parx, pary):
+        """
+        Vectorized version of the cost function useful for plotting.
+
+        Parameters
+        ----------
+        parx_index : int
+            Index of the x-axis parameter.
+        pary_index : int
+            Index of the y-axis parameter.
+        parx : array_like
+            Values of the x-axis parameter.
+        pary : array_like
+            Values of the y-axis parameter.
+
+        Returns
+        -------
+        np.ndarray
+            2D array of the cost values.
+        """
 
         vcost = []
         for y in pary:
@@ -123,8 +215,23 @@ class LikelihoodFitter(ABC):
         vcost = np.reshape(vcost, newshape=(len(pary), len(parx)))
         return vcost
 
-    # kwargs passed to scipy.optimize.minimize to control the minimization
     def fit(self, seed, **kwargs):
+        """
+        Fit the model to the data.
+
+        Parameters
+        ----------
+        seed : array_like
+            Initial guess for the parameters.
+        **kwargs
+            Additional keyword arguments passed to scipy.optimize.minimize.
+
+        Returns
+        -------
+        int
+            Status code of the optimization process.
+        """
+        
         self.fit_result = minimize(self.cost_function, x0=seed, **kwargs)
 
         if not self.fit_result.success:
@@ -135,18 +242,64 @@ class LikelihoodFitter(ABC):
 
     # Fit results getters
     def get_estimators(self):
+        """
+        Get the maximum likelihood estimators of the fit parameters.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the maximum likelihood estimators.
+        """
+        
         return self.fit_result.x
 
     def get_errors(self):
+        """
+        Get the errors of the fit parameters.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the errors of the fit parameters.
+        """
+        
         covariance = self.get_covariance_matrix()
         errors = np.sqrt(np.diagonal(covariance))
         return errors
 
     def get_covariance_matrix(self):
+        """
+        Get the covariance matrix of the fitted parameters.
+
+        Returns
+        -------
+        np.ndarray
+            Covariance matrix of the fitted parameters.
+        """    
+    
         covariance = 2 * self.fit_result.hess_inv
         return covariance
 
     def get_confidence_ellipse(self, xindex, yindex, nsigma: int = 1, npoints: int = 100):
+        """
+        Get the confidence ellipse for a pair of parameters.
+
+        Parameters
+        ----------
+        xindex : int
+            Index of the x-axis parameter.
+        yindex : int
+            Index of the y-axis parameter.
+        nsigma : int, optional
+            Number of standard deviations for the confidence ellipse. Default is 1.
+        npoints : int, optional
+            Number of points to use for the ellipse. Default is 100.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the coordinates of the confidence ellipse.
+        """
 
         # Get the estimators and covariance matrix for a pair of estimators
         estimators = self.get_estimators()
@@ -163,33 +316,94 @@ class LikelihoodFitter(ABC):
         return ellipse.T
 
     def get_correlation_matrix(self):
+        """
+        Get the correlation matrix of the fitted parameters.
+
+        Returns
+        -------
+        np.ndarray
+            Correlation matrix of the fitted parameters.
+        """
+        
         covariance = self.get_covariance_matrix()
         errors = self.get_errors()
         correlation = covariance / np.tensordot(errors, errors, axes=0)
         return correlation
 
     def get_deviance(self):
+        """
+        Get the deviance of the fit.
+
+        Returns
+        -------
+        float
+            The deviance of the fit.
+        """
+        
         return self.fit_result.fun
 
     def get_ndof(self):
+        """
+        Get the number of degrees of freedom.
+
+        Returns
+        -------
+        int
+            Number of degrees of freedom.
+        """
+        
         estimators = self.get_estimators()
         ndof = len(self.xdata) - len(estimators)
         return ndof
 
     def get_pvalue(self):
+        """
+        Get the p-value of the fit.
+
+        Returns
+        -------
+        float
+            The p-value of the fit.
+        """
+        
         deviance = self.get_deviance()
         ndof = self.get_ndof()
         pvalue = chi2.sf(deviance, ndof)
         return pvalue
 
-    # def get_minimize_result(self):
-    #    return self.fit_result
-
     def get_yfit(self, x):
+        """
+        Get the model predictions for a given set of independent variables.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Values of the independent variable.
+
+        Returns
+        -------
+        np.ndarray
+            Model predictions for the given independent variable values.
+        """
+        
         estimators = self.get_estimators()
         return self.model(x, estimators) 
 
     def get_yfit_error(self, x):
+        """
+        Get the errors of the model predictions for a given set of independent variables.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Values of the independent variable.
+
+        Returns
+        -------
+        np.ndarray
+            Errors of the model predictions for the given independent variable values.
+        """
+
         gradient = self.get_gradient(x)
 
         # Propagate parameter errors
@@ -199,18 +413,40 @@ class LikelihoodFitter(ABC):
         
         return sigma_yfit
 
-    # Return an array with the maximum likelihood estimator of each data point
     @abstractmethod
     def get_ydata(self):
+        """
+        Abstract method to get the maximum likelihood estimator of each data point.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the maximum likelihood estimator of each data point.
+        """
+        
         pass
 
-    # Return an array with the error of each data point
     @abstractmethod
     def get_ydata_errors(self):
+        """
+        Abstract method to get the errors of each data point.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the errors of each data point.
+        """
         pass
 
-    # Return an array with the difference between the data and the fit
     def get_residuals(self):
+        """
+        Get the residuals calculated as the data minus the fit at each data point.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the residuals.
+        """
         return self.get_ydata() - self.get_yfit(self.xdata)
 
     # Numerical derivative of the model wrt the parameters evaluated at the estimators
@@ -223,6 +459,24 @@ class LikelihoodFitter(ABC):
             the independent variable
     """
     def get_gradient(self, x):
+        """
+        Get the numerical derivative of the model with respect to the parameters.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Values of the independent variable at which the gradient will be evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            2D array containing the calculated gradient.
+            
+       Notes
+       -----
+            The first dimension of the returned array corresponds to the fit parameters and the second 
+            one to the values of the independent variable
+        """
 
         estimators = self.get_estimators()
         errors = self.get_errors()
@@ -252,6 +506,10 @@ class LikelihoodFitter(ABC):
         return gradient
 
     def print_results(self):
+        """
+        Print a summary of the fit results including estimators, errors, covariance matrix, and more.
+        """
+        
         print("Fit summary")
         print(f"Estimators: {self.get_estimators()}")
         print(f"Errors: {self.get_errors()}")
@@ -262,7 +520,17 @@ class LikelihoodFitter(ABC):
         print(f"Pvalue: {self.get_pvalue()}")
 
     def plot_fit(self, xlabel="x", ylabel="y"):
-        # Plot
+        """
+        Plot the data, the fit, and the error band.
+
+        Parameters
+        ----------
+        xlabel : str, optional
+            Label for the x-axis.
+        ylabel : str, optional
+            Label for the y-axis.
+        """
+        
         fig, ax = plt.subplots()
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
@@ -285,14 +553,22 @@ class LikelihoodFitter(ABC):
         plt.tight_layout()
         plt.show()
 
-
-    # Plot the 1σ and 2σ confidence ellipses
-    # The ellipses are calculated from the covariance matrix of the estimators
-    # Two parameters must be selected
-    # The first parameter is in xdata-axis and the second parameter in the ydata-axis
     def plot_confidence_ellipses(self, parx_index, pary_index, xlabel=None, ylabel=None):
+        """
+        Plot the 1σ and 2σ confidence ellipses for a pair of parameters.
 
-        # Plot
+        Parameters
+        ----------
+        parx_index : int
+            Index of the x-axis parameter.
+        pary_index : int
+            Index of the y-axis parameter.
+        xlabel : str, optional
+            Label for the x-axis.
+        ylabel : str, optional
+            Label for the y-axis.
+        """
+
         fig, ax = plt.subplots()
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
@@ -309,11 +585,23 @@ class LikelihoodFitter(ABC):
         plt.tight_layout()
         plt.show()
 
-    # Plot a surface of the fit cost function
-    # Two parameters must be selected
-    # The first parameter is in xdata-axis and the second parameter in the ydata-axis
-    # nsgima: number of nσ confidence levels to include in the plot
     def plot_cost_function(self, parx_index, pary_index, xlabel=None, ylabel=None, nsigma=2):
+        """
+        Plot the surface of the fit cost function for a pair of parameters.
+
+        Parameters
+        ----------
+        parx_index : int
+            Index of the x-axis parameter.
+        pary_index : int
+            Index of the y-axis parameter.
+        xlabel : str, optional
+            Label for the x-axis.
+        ylabel : str, optional
+            Label for the y-axis.
+        nsigma : int, optional
+            Number of sigma confidence levels to include in the plot.
+        """
 
         # Calculate coordinates of the points to plot
         estimators = self.get_estimators()
@@ -350,11 +638,28 @@ class LikelihoodFitter(ABC):
 
         plt.show()
 
-    # Plot a the contour levels of the fit cost function
-    # Two parameters must be selected
-    # The first parameter is in xdata-axis and the second parameter in the ydata-axis
-    # nsgima: number of nσ confidence levels to plot
     def plot_confidence_regions(self, parx_index, pary_index, xlabel=None, ylabel=None, nsigma=2):
+        """
+        Plot the confidence regions for a pair of parameters.
+
+        Parameters
+        ----------
+        parx_index : int
+            Index of the x-axis parameter.
+        pary_index : int
+            Index of the y-axis parameter.
+        xlabel : str, optional
+            Label for the x-axis.
+        ylabel : str, optional
+            Label for the y-axis.
+        nsigma : int, optional
+            Number of sigma confidence levels to plot.
+
+        Returns
+        -------
+        None
+        """
+        
         # Calculate coordinates of the points to plot
         estimators = self.get_estimators()
         errors = self.get_errors()
@@ -398,8 +703,54 @@ class LikelihoodFitter(ABC):
 
 
 class LinearLeastSquares(LikelihoodFitter):
+    """
+    Linear least squares fitter based on the LikelihoodFitter base class.
+
+    Parameters
+    ----------
+    xdata : array_like
+        The independent variable data.
+    ydata : array_like
+        The dependent variable data.
+    ydata_error : array_like
+        Errors associated with the dependent variable data.
+    model : callable
+        The linear model function to fit the data.
+
+    Attributes
+    ----------
+    xdata : array_like
+        The independent variable data.
+    ydata : array_like
+        The dependent variable data.
+    ydata_error : array_like
+        Errors associated with the dependent variable data.
+    model : callable
+        The linear model function to fit the data.
+    model_matrix : np.ndarray
+        Matrix generated by the linear model.
+    estimators : np.ndarray
+        Maximum likelihood estimators of the fit parameters.
+    cova_par : np.ndarray
+        Covariance matrix of the fit parameters.
+    """
 
     def __init__(self, xdata, ydata, ydata_error, model):
+        """
+        Initialize the LinearLeastSquares instance.
+
+        Parameters
+        ----------
+        xdata : array_like
+            The independent variable data.
+        ydata : array_like
+            The dependent variable data.
+        ydata_error : array_like
+            Errors associated with the dependent variable data.
+        model : callable
+            The linear model function to fit the data.
+        """
+        
         LikelihoodFitter.__init__(self, xdata, model)
         self.ydata = ydata
         self.ydata_error = ydata_error
@@ -407,8 +758,20 @@ class LinearLeastSquares(LikelihoodFitter):
         self.__set_model_matrix(npar)
 
 
-    # Dirty way to count the number of fit parameters forcing an IndexError exception until reaching the number of parameters
     def __count_parameters(self):
+        """
+        Count the number of the fit parameters 
+
+        Returns
+        -------
+        int
+            The number of fit parameters.
+        
+        Notes
+        -----
+        Dirty way to count the number of the fit parameters by forcing an IndexError exception until reaching the number of parameters
+        """
+        
         npar = 0
         par = np.array([1])
         
@@ -425,6 +788,15 @@ class LinearLeastSquares(LikelihoodFitter):
         return npar
 
     def __set_model_matrix(self, npar):
+        """
+        Set the model matrix based on the linear model and the number of fit parameters.
+
+        Parameters
+        ----------
+        npar : int
+            The number of fit parameters.
+        """
+        
         column_list = []
         for pari in range(npar):
             unit_vector = np.zeros(shape=npar)
@@ -435,11 +807,29 @@ class LinearLeastSquares(LikelihoodFitter):
         self.model_matrix = np.array(column_list)
 
     def cost_function(self, par):
+        """
+        Calculate the cost function for the linear least squares fit.
+
+        Parameters
+        ----------
+        par : np.ndarray
+            The parameters to evaluate the cost function.
+
+        Returns
+        -------
+        float
+            The value of the cost function.
+        """
+        
         yfit = self.model(self.xdata, par)
         data_point_costs = normal_cost(yfit, self.ydata, self.ydata_error)
         return data_point_costs.sum()
 
     def fit(self):
+        """
+        Perform the linear least squares fit and compute estimators and covariance matrix.
+        """
+        
         inv_var_y = self.ydata_error ** (-2)
         inv_cova_par = np.einsum('ij,j,lj', self.model_matrix, inv_var_y, self.model_matrix)
         self.cova_par = np.linalg.inv(inv_cova_par)
@@ -447,82 +837,337 @@ class LinearLeastSquares(LikelihoodFitter):
         self.estimators = np.einsum('ij,j', matrix_b, self.ydata)
 
     def get_covariance_matrix(self):
+        """
+        Get the covariance matrix of the fit parameters.
+
+        Returns
+        -------
+        np.ndarray
+            Covariance matrix of the fit parameters.
+        """
+        
         return self.cova_par
 
     def get_deviance(self):
+        """
+        Get the deviance of the linear least squares fit.
+
+        Returns
+        -------
+        float
+            The deviance of the fit.
+        """
+        
         residuals = self.ydata - self.get_yfit(self.xdata)
         z_array = residuals/self.ydata_error
         chi2_min = np.sum(z_array**2)
         return chi2_min
 
     def get_estimators(self):
+        """
+        Get the maximum likelihood estimators for the fitted parameters.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the maximum likelihood estimators.
+        """
+        
         return self.estimators
 
     def get_ydata(self):
+        """
+        Get the dependent variable data.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the dependent variable data.
+        """
+    
         return self.ydata
 
     def get_ydata_errors(self):
+        """
+        Get the errors of the dependent variable data.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the errors of the dependent variable data.
+        """
+        
         return self.ydata_error
 
 
 class NonLinearLeastSquares(LikelihoodFitter):
+    """
+    Non-linear least squares fitter based on the LikelihoodFitter base class.
 
+    Parameters
+    ----------
+    xdata : array_like
+        The independent variable data.
+    ydata : array_like
+        The dependent variable data.
+    ydata_error : array_like
+        Errors associated with the dependent variable data.
+    model : callable
+        The non-linear model function to fit the data.
+
+    Attributes
+    ----------
+    xdata : array_like
+        The independent variable data.
+    ydata : array_like
+        The dependent variable data.
+    ydata_error : array_like
+        Errors associated with the dependent variable data.
+    model : callable
+        The non-linear model function to fit the data.
+    """
+    
     def __init__(self, xdata, ydata, ydata_error, model):
+        """
+        Initialize the NonLinearLeastSquares instance.
+
+        Parameters
+        ----------
+        xdata : array_like
+            The independent variable data.
+        ydata : array_like
+            The dependent variable data.
+        ydata_error : array_like
+            Errors associated with the dependent variable data.
+        model : callable
+            The non-linear model function to fit the data.
+        """
+        
         LikelihoodFitter.__init__(self, xdata, model)
         self.ydata = ydata
         self.ydata_error = ydata_error
 
     def cost_function(self, par):
+        """
+        Calculate the cost function for the non-linear least squares fit.
+
+        Parameters
+        ----------
+        par : np.ndarray
+            The parameters to evaluate the cost function.
+
+        Returns
+        -------
+        float
+            The value of the cost function.
+        """
+        
         yfit = self.model(self.xdata, par)
         data_point_costs = normal_cost(yfit, self.ydata, self.ydata_error)
         return data_point_costs.sum()
 
     def get_ydata(self):
+        """
+        Get the dependent variable data.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the dependent variable data.
+        """
         return self.ydata
 
     def get_ydata_errors(self):
+        """
+        Get the errors associated with the dependent variable data.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the errors associated with the dependent variable data.
+        """
         return self.ydata_error
 
 
 class Poisson(LikelihoodFitter):
+    """
+    Poisson fitter based on the LikelihoodFitter base class.
+
+    Parameters
+    ----------
+    xdata : array_like
+        The independent variable data.
+    nevents : array_like
+        The number of observed events data.
+    model : callable
+        The model function to fit the data.
+
+    Attributes
+    ----------
+    xdata : array_like
+        The independent variable data.
+    nevents : array_like
+        The number of observed events data.
+    model : callable
+        The model function to fit the data.
+    """
 
     def __init__(self, xdata, nevents, model):
+        """
+        Initialize the Poisson fitter instance.
+
+        Parameters
+        ----------
+        xdata : array_like
+            The independent variable data.
+        nevents : array_like
+            The number of observed events data.
+        model : callable
+            The model function to fit the data.
+        """
         LikelihoodFitter.__init__(self, xdata, model)
         self.nevents = nevents
 
-    # Poisson cost function
     def cost_function(self, par):
+        """
+        Calculate the Poisson cost function for the fit.
+
+        Parameters
+        ----------
+        par : np.ndarray
+            The parameters to evaluate the cost function.
+
+        Returns
+        -------
+        float
+            The value of the Poisson cost function.
+        """
         yfit = self.model(self.xdata, par)
         data_point_costs = poisson_cost(yfit, self.nevents)
         return data_point_costs.sum()
 
     def get_ydata(self):
+        """
+        Get the number of observed events data.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the number of observed events data.
+        """
+        
         return self.nevents
 
-    # Approximated Poisson errors
     def get_ydata_errors(self):
+        """
+        Get the approximated Poisson errors associated with the number of observed events.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the approximated Poisson errors.
+            
+        Notes
+        -----
+        These approximated errors are invalid when the number of observed events is zero
+        """
+        
         return np.sqrt(self.nevents)
 
 
 class Binomial(LikelihoodFitter):
+    """
+    Binomial fitter based on the LikelihoodFitter base class.
+
+    Parameters
+    ----------
+    xdata : array_like
+        The independent variable data.
+    ntrials : array_like
+        The number of trials data.
+    nsuccess : array_like
+        The number of successful trials data.
+    model : callable
+        The Binomial model function to fit the data.
+
+    Attributes
+    ----------
+    xdata : array_like
+        The independent variable data.
+    ntrials : array_like
+        The number of trials data.
+    nsuccess : array_like
+        The number of successful trials data.
+    model : callable
+        The model function to fit the data.
+    """
 
     def __init__(self, x, ntrials, nsuccess, model):
+        """
+        Initialize the Binomial fitter instance.
+
+        Parameters
+        ----------
+        xdata : array_like
+            The independent variable data.
+        ntrials : array_like
+            The number of trials data.
+        nsuccess : array_like
+            The number of successful trials data.
+        model : callable
+            The model function to fit the data.
+        """
+        
         LikelihoodFitter.__init__(self, x, model)
         self.ntrials = ntrials
         self.nsuccess = nsuccess
 
-    # Binomial cost function
     def cost_function(self, par):
+        """
+        Calculate the Binomial cost function for the fit.
+
+        Parameters
+        ----------
+        par : np.ndarray
+            The parameters to evaluate the cost function.
+
+        Returns
+        -------
+        float
+            The value of the Binomial cost function.
+        """
+        
         # Bernoulli probability for each xdata according to the model
         yfit = self.model(self.xdata, par)
         data_point_costs = binomial_cost(yfit, self.nsuccess, self.ntrials)
         return data_point_costs.sum()
 
     def get_ydata(self):
+        """
+        Get the probability of success for each trial data.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the probability of success for each trial data.
+        """
+        
         return self.nsuccess / self.ntrials
 
-    # Approximated binomial errors, not valid when nsuccess~0 or nsuccess~ntrials
     def get_ydata_errors(self):
+        """
+        Get the approximated Binomial errors associated with the probability of success.
+
+        Returns
+        -------
+        np.ndarray
+            Array containing the approximated Binomial errors.
+            
+        Notes
+        -----
+        These approximated errors are invalid in the limits of the number of successes is equal to zero or to the number of trials.
+        """
+        
         proba_mle = self.get_ydata()
         ydata_variance = proba_mle * (1-proba_mle) / self.ntrials
         return np.sqrt(ydata_variance)
