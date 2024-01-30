@@ -25,7 +25,7 @@ def test_initialization(binomial_fitter):
 
 def test_fit(binomial_fitter):
     seed = np.array([0.5, 1])
-    assert binomial_fitter.fit(seed) == 0
+    assert binomial_fitter.fit(seed, tol=1e-4) == 0
 
 
 def test_cost_function(binomial_fitter):
