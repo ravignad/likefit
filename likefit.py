@@ -685,8 +685,8 @@ class LikelihoodFitter(ABC):
         sigma_levels = np.arange(0, nsigma+1)
         contours = ax.contour(x, y, z, levels=sigma_levels, colors='black', linestyles='dashed')
 
-        def fmt(x):
-            return f"{x:.0f}σ"
+        def fmt(nsigma_label):
+            return f"{nsigma_label:.0f}σ"
 
         ax.clabel(contours, contours.levels, fmt=fmt, inline=True)
 
@@ -768,7 +768,8 @@ class LinearLeastSquares(LikelihoodFitter):
         
         Notes
         -----
-        Dirty way to count the number of the fit parameters by forcing an IndexError exception until reaching the number of parameters
+        Dirty way to count the number of the fit parameters by forcing an IndexError exception until reaching
+        the number of parameters
         """
         
         npar = 0
@@ -780,7 +781,7 @@ class LinearLeastSquares(LikelihoodFitter):
             except IndexError:
                 npar += 1
                 par = np.zeros(npar)
-                par[-1]=1
+                par[-1] = 1
             else:
                 break
         
@@ -1159,7 +1160,8 @@ class Binomial(LikelihoodFitter):
             
         Notes
         -----
-        These approximated errors are invalid in the limits of the number of successes is equal to zero or to the number of trials.
+        These approximated errors are invalid in the limits of the number of successes is equal to zero or
+        to the number of trials.
         """
         
         proba_mle = self.get_ydata()
