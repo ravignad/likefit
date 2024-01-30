@@ -39,7 +39,7 @@ def fit_model(x, par):
 
 
 # Create a least squares fitter and inititalize it with the data and the fit model
-fitter = likefit.NonLinearLeastSquares(xdata, ydata, ysigma, fit_model)
+fitter = likefit.LeastSquares(xdata, ydata, ysigma, fit_model)
 
 # Fit the data
 seed = np.array([0, 0])

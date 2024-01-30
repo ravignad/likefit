@@ -900,7 +900,7 @@ class LinearLeastSquares(LikelihoodFitter):
         return self.ydata_error
 
 
-class NonLinearLeastSquares(LikelihoodFitter):
+class LeastSquares(LikelihoodFitter):
     """
     Non-linear least squares fitter based on the LikelihoodFitter base class.
 
@@ -929,7 +929,7 @@ class NonLinearLeastSquares(LikelihoodFitter):
     
     def __init__(self, xdata, ydata, ydata_error, model):
         """
-        Initialize the NonLinearLeastSquares instance.
+        Initialize the LeastSquares instance.
 
         Parameters
         ----------

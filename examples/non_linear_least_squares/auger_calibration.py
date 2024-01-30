@@ -34,7 +34,7 @@ def fit_model(energy, par):
 
 # We fit with non-linear least squares because the fit model is not linear in the parameters
 # and the shower size assigned to the y variable follows a normal distribution
-fitter = likefit.NonLinearLeastSquares(xdata, ydata, yerror, fit_model)
+fitter = likefit.LeastSquares(xdata, ydata, yerror, fit_model)
 
 # The convergence of the fit depends heavily on choosing a seed close to the minimum
 seed = np.array([7, 1])
