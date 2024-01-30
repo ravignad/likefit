@@ -2,14 +2,17 @@ import pytest
 import numpy as np
 import likefit
 
+
 # fit_model is sigmoid function vectorized in xdata
 def fit_model(x, par):
     return 1 / (1+np.exp(-(x-par[0])/par[1]))
+
 
 # Sample data for testing
 xdata = np.arange(start=0.05, stop=1.05, step=0.05)
 ntrials = np.full(xdata.shape, fill_value=30)
 nsuccess = np.array([0, 0, 0, 3, 3, 2, 8, 5, 4, 11, 18, 15, 19, 20, 26, 24, 26, 29, 30, 30])
+
 
 @pytest.fixture
 def binomial_fitter():
@@ -38,5 +41,3 @@ def test_cost_function(binomial_fitter):
 def test_get_ydata(binomial_fitter):
     ydata = binomial_fitter.get_ydata()
     assert np.array_equal(ydata, nsuccess/ntrials)
-
-
