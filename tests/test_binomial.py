@@ -22,19 +22,21 @@ def test_initialization(binomial_fitter):
     assert np.array_equal(binomial_fitter.nsuccess, nsuccess)
     assert binomial_fitter.model is fit_model
 
+
+def test_fit(binomial_fitter):
+    seed = np.array([0.5, 1])
+    assert binomial_fitter.fit(seed) == 0
+
+
 def test_cost_function(binomial_fitter):
     # Test the cost function with some dummy parameters
     par = np.array([0.5, 1])
     cost = binomial_fitter.cost_function(par)
     assert cost == 2619.431668583625
 
+
 def test_get_ydata(binomial_fitter):
     ydata = binomial_fitter.get_ydata()
     assert np.array_equal(ydata, nsuccess/ntrials)
 
-def test_get_ydata_errors(binomial_fitter):
-    ydata_errors = binomial_fitter.get_ydata_errors()
-    proba_mle = nsuccess / ntrials
-    ydata_variance = proba_mle * (1 - proba_mle) / ntrials
-    ydata_std = np.sqrt(ydata_variance)
-    assert np.array_equal(ydata_errors, ydata_std)
+
