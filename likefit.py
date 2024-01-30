@@ -757,7 +757,6 @@ class LinearLeastSquares(LikelihoodFitter):
         npar = self.__count_parameters()
         self.__set_model_matrix(npar)
 
-
     def __count_parameters(self):
         """
         Count the number of the fit parameters 
@@ -835,6 +834,7 @@ class LinearLeastSquares(LikelihoodFitter):
         self.cova_par = np.linalg.inv(inv_cova_par)
         matrix_b = np.einsum('ij,jk,k -> ik', self.cova_par, self.model_matrix, inv_var_y)
         self.estimators = np.einsum('ij,j', matrix_b, self.ydata)
+        return 0
 
     def get_covariance_matrix(self):
         """
@@ -1081,8 +1081,6 @@ class Binomial(LikelihoodFitter):
 
     Parameters
     ----------
-    xdata : array_like
-        The independent variable data.
     ntrials : array_like
         The number of trials data.
     nsuccess : array_like
@@ -1092,8 +1090,6 @@ class Binomial(LikelihoodFitter):
 
     Attributes
     ----------
-    xdata : array_like
-        The independent variable data.
     ntrials : array_like
         The number of trials data.
     nsuccess : array_like
@@ -1108,8 +1104,6 @@ class Binomial(LikelihoodFitter):
 
         Parameters
         ----------
-        xdata : array_like
-            The independent variable data.
         ntrials : array_like
             The number of trials data.
         nsuccess : array_like
