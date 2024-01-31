@@ -27,7 +27,7 @@ branch. Pull requests are warmly welcome.
 
 ## Links
 - Repository: https://github.com/ravignad/likefit/
-- Tutorials: https://github.com/ravignad/likefit/doc/tutorial
+- Tutorials: https://bit.ly/3HFlFJ1
 
 ## Licensing
 The code in this project is licensed under MIT license.
