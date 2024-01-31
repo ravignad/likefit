@@ -1,7 +1,7 @@
 # LikeFit
 
 LikeFit is a library to fit data for science and engineering. 
-It provides a simple yet comprehensive interface to perform linear and nonlinear least squares and other likelihood fits.
+It provides a user-friendly and comprehensive interface for linear and non-linear least squares, and likelihood fits.
 
 
 ## Install
@@ -11,11 +11,11 @@ python -m pip install likefit
 ```
 
 ## Features
-  * Linear and nonlinear least squares fits with a consistent interface
+  * Linear and nonlinear least squares fit with a consistent interface
   * Fit of histograms with a Poisson likelihood
   * Calculation of estimators, errors, and correlations
   * Evaluation of goodness-of-fit with chi-squared test
-  * Plotting of error bands, confidence regions, and likelihood functions
+  * Plot of error bands, confidence regions, and likelihood functions
 
 ## How to use
 
@@ -154,7 +154,7 @@ fitter.print_results()
 ```
 
 ## Contributing
-If you'd like to contribute, please fork the repository and use a feature
+If you want to contribute, please fork the repository and use a feature
 branch. Pull requests are warmly welcome.
 
 ## Links
