@@ -330,14 +330,14 @@ class LikelihoodFitter(ABC):
         correlation = covariance / np.tensordot(errors, errors, axes=0)
         return correlation
 
-    def get_deviance(self):
+    def get_chi_square(self):
         """
-        Get the deviance of the fit.
+        Get the chi-square statistic of the fit.
 
         Returns
         -------
         float
-            The deviance of the fit.
+            The chi-square statistic of the fit.
         """
         
         return self.fit_result.fun
@@ -366,7 +366,7 @@ class LikelihoodFitter(ABC):
             The p-value of the fit.
         """
         
-        deviance = self.get_deviance()
+        deviance = self.get_chi_square()
         ndof = self.get_ndof()
         pvalue = chi2.sf(deviance, ndof)
         return pvalue
@@ -515,7 +515,7 @@ class LikelihoodFitter(ABC):
         print(f"Errors: {self.get_errors()}")
         print(f"Covariance matrix: {self.get_covariance_matrix()}")
         print(f"Correlation matrix: {self.get_correlation_matrix()}")
-        print(f"Deviance: {self.get_deviance()}")
+        print(f"Deviance: {self.get_chi_square()}")
         print(f"Degrees of freedom: {self.get_ndof()}")
         print(f"Pvalue: {self.get_pvalue()}")
 
@@ -849,7 +849,7 @@ class LinearLeastSquares(LikelihoodFitter):
         
         return self.cova_par
 
-    def get_deviance(self):
+    def get_chi_square(self):
         """
         Get the deviance of the linear least squares fit.
 
