@@ -515,7 +515,7 @@ class LikelihoodFitter(ABC):
         print(f"Errors: {self.get_errors()}")
         print(f"Covariance matrix: {self.get_covariance_matrix()}")
         print(f"Correlation matrix: {self.get_correlation_matrix()}")
-        print(f"Deviance: {self.get_chi_square()}")
+        print(f"Chi square: {self.get_chi_square()}")
         print(f"Degrees of freedom: {self.get_ndof()}")
         print(f"Pvalue: {self.get_pvalue()}")
 
