@@ -735,6 +735,8 @@ class LinearLeastSquares(LikelihoodFitter):
         Covariance matrix of the fit parameters.
     """
 
+# TODO: Default ydata_error to 1
+
     def __init__(self, xdata, ydata, ydata_error, model):
         """
         Initialize the LinearLeastSquares instance.
