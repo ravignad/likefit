@@ -11,3 +11,6 @@ build/
 
 # Jupyter notebook internal stuff
 .ipynb_checkpoints
+
+# Documenation
+doc/sphinx
