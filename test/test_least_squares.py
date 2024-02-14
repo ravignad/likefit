@@ -14,7 +14,7 @@ def fit_model(x, par):
 
 @pytest.fixture
 def least_squares_fitter():
-    return likefit.LeastSquares(xdata, ydata, ysigma, fit_model)
+    return likefit.LeastSquares(xdata, ydata, fit_model, ysigma)
 
 
 def test_initialization(least_squares_fitter):
@@ -27,3 +27,17 @@ def test_initialization(least_squares_fitter):
 def test_fit(least_squares_fitter):
     seed = np.array([0, 0])
     assert least_squares_fitter.fit(seed) == 0
+
+
+def test_constant_errors():
+    ysigma_constant = 1
+    fitter = likefit.LeastSquares(xdata, ydata, fit_model, ysigma_constant)
+    seed = np.array([0, 0])
+    res = fitter.fit(seed)
+    assert res == 0
+
+def test_default_errors():
+    fitter = likefit.LeastSquares(xdata, ydata, fit_model)
+    seed = np.array([0, 0])
+    res = fitter.fit(seed)
+    assert res == 0

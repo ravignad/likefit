@@ -1,7 +1,7 @@
 # Library to fit data with several likelihood functions
 
 from abc import ABC, abstractmethod
-
+import collections.abc
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import chi2
@@ -735,9 +735,7 @@ class LinearLeastSquares(LikelihoodFitter):
         Covariance matrix of the fit parameters.
     """
 
-# TODO: Default ydata_error to 1
-
-    def __init__(self, xdata, ydata, ydata_error, model):
+    def __init__(self, xdata, ydata, model, ydata_error=1):
         """
         Initialize the LinearLeastSquares instance.
 
@@ -747,15 +745,23 @@ class LinearLeastSquares(LikelihoodFitter):
             The independent variable data.
         ydata : array_like
             The dependent variable data.
-        ydata_error : array_like
-            Errors associated with the dependent variable data.
         model : callable
             The linear model function to fit the data.
+        ydata_error : array_like or float, optional
+            Errors associated with the dependent variable data. It must be the an array of same size as ydata
+            if the errors depend on the data point or a float if the all errors are equal. By default, the
+            errors are set to 1.
         """
         
         LikelihoodFitter.__init__(self, xdata, model)
         self.ydata = ydata
-        self.ydata_error = ydata_error
+
+        # If ydata_error is scalar expand to the length of the ydata array
+        if isinstance(ydata_error, collections.abc.Sequence):
+            self.ydata_error = ydata_error
+        else:
+            self.ydata_error = np.ones_like(ydata) * ydata_error
+
         npar = self.__count_parameters()
         self.__set_model_matrix(npar)
 
@@ -930,7 +936,7 @@ class LeastSquares(LikelihoodFitter):
         The non-linear model function to fit the data.
     """
     
-    def __init__(self, xdata, ydata, ydata_error, model):
+    def __init__(self, xdata, ydata, model, ydata_error=1):
         """
         Initialize the LeastSquares instance.
 
@@ -940,15 +946,22 @@ class LeastSquares(LikelihoodFitter):
             The independent variable data.
         ydata : array_like
             The dependent variable data.
-        ydata_error : array_like
-            Errors associated with the dependent variable data.
         model : callable
-            The non-linear model function to fit the data.
+            The linear model function to fit the data.
+        ydata_error : array_like or float, optional
+            Errors associated with the dependent variable data. It must be the an array of same size as ydata
+            if the errors depend on the data point or a float if the all errors are equal. By default, the
+            errors are set to 1.
         """
         
         LikelihoodFitter.__init__(self, xdata, model)
         self.ydata = ydata
-        self.ydata_error = ydata_error
+
+        # If ydata_error is scalar expand to the length of the ydata array
+        if isinstance(ydata_error, collections.abc.Sequence):
+            self.ydata_error = ydata_error
+        else:
+            self.ydata_error = np.ones_like(ydata) * ydata_error
 
     def cost_function(self, par):
         """
