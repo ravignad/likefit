@@ -77,17 +77,17 @@ def poisson_cost(mu: np.ndarray, nevents: np.ndarray) -> np.ndarray:
     return cost
 
 
-def binomial_cost(proba: np.ndarray, nsuccess: np.ndarray, ntrials: np.ndarray) -> np.ndarray:
+def binomial_cost(proba: float or np.ndarray, nsuccess: float or np.ndarray, ntrials: float or np.ndarray) -> np.ndarray:
     """
     Calculate the binomial costs for each data point.
 
     Parameters
     ----------
-    proba : np.ndarray
+    proba : float or np.ndarray
         Array of success probabilities for each data point.
-    nsuccess : np.ndarray
+    nsuccess : float or np.ndarray
         Array of the number of successes for each data point.
-    ntrials : np.ndarray
+    ntrials : float or np.ndarray
         Array of the number of trials for each data point.
 
     Returns
@@ -102,6 +102,8 @@ def binomial_cost(proba: np.ndarray, nsuccess: np.ndarray, ntrials: np.ndarray) 
         2) 0 < nsuccess < ntrials
         3) nsuccess=ntrials
     """
+
+    proba = np.asarray(proba)
 
     # If nsuccess is scalar expand to the length of the proba array
     if not isinstance(nsuccess, collections.abc.Sequence):
