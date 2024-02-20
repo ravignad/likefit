@@ -35,9 +35,19 @@ def test_cost_function(binomial_fitter):
     # Test the cost function with some dummy parameters
     par = np.array([0.5, 1])
     cost = binomial_fitter.cost_function(par)
-    assert cost == 2619.431668583625
+    assert cost == 298.832751257985
 
 
 def test_get_ydata(binomial_fitter):
     ydata = binomial_fitter.get_ydata()
     assert np.array_equal(ydata, nsuccess/ntrials)
+
+
+def test_cost_single_trial():
+    ntrials = 30
+    nsuccess = 15
+    proba = np.linspace(0.3, 0.7)
+    cost = likefit.binomial_cost(proba, nsuccess, ntrials)
+    cost_sum = cost.sum()
+    assert cost_sum == 87.78818608512154
+

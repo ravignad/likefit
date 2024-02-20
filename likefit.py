@@ -103,6 +103,14 @@ def binomial_cost(proba: np.ndarray, nsuccess: np.ndarray, ntrials: np.ndarray) 
         3) nsuccess=ntrials
     """
 
+    # If nsuccess is scalar expand to the length of the proba array
+    if not isinstance(nsuccess, collections.abc.Sequence):
+        nsuccess = np.ones_like(proba) * nsuccess
+
+    # If ntrials is scalar expand to the length of the proba array
+    if not isinstance(ntrials, collections.abc.Sequence):
+        ntrials = np.ones_like(proba) * ntrials
+
     cost = np.zeros_like(proba)
 
     # Maximum likelihood estimator of the Bernoulli probability
@@ -113,7 +121,7 @@ def binomial_cost(proba: np.ndarray, nsuccess: np.ndarray, ntrials: np.ndarray) 
     proba1 = proba[zero_mask]
     ntrials1 = ntrials[zero_mask]
     likelihood_ratio1 = ntrials1 * np.log(1 - proba1)
-    cost1 = -2 * likelihood_ratio1.sum()
+    cost1 = -2 * likelihood_ratio1
     cost[zero_mask] += cost1
 
     # Case 0 < nsuccess < ntrials
@@ -123,7 +131,7 @@ def binomial_cost(proba: np.ndarray, nsuccess: np.ndarray, ntrials: np.ndarray) 
     proba_mle2 = proba_mle[intermediate_mask]
     likelihood_ratio2 = ntrials2 * (proba_mle2 * np.log(proba2 / proba_mle2)
                                     + (1 - proba_mle2) * np.log((1 - proba2) / (1 - proba_mle2)))
-    cost2 = -2 * likelihood_ratio2.sum()
+    cost2 = -2 * likelihood_ratio2
     cost[intermediate_mask] += cost2
 
     # Case nsuccess = ntrials
@@ -131,7 +139,7 @@ def binomial_cost(proba: np.ndarray, nsuccess: np.ndarray, ntrials: np.ndarray) 
     proba3 = proba[ntrials_mask]
     ntrials3 = ntrials[ntrials_mask]
     likelihood_ratio3 = ntrials3 * np.log(proba3)
-    cost3 = -2 * likelihood_ratio3.sum()
+    cost3 = -2 * likelihood_ratio3
     cost[ntrials_mask] += cost3
 
     return cost
