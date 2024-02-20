@@ -519,7 +519,7 @@ class LikelihoodFitter(ABC):
         print(f"Degrees of freedom: {self.get_ndof()}")
         print(f"Pvalue: {self.get_pvalue()}")
 
-    def plot_fit(self, xlabel="x", ylabel="y"):
+    def plot_fit(self, xlabel="x", ylabel="y", ax=None):
         """
         Plot the data, the fit, and the error band.
 
@@ -529,9 +529,13 @@ class LikelihoodFitter(ABC):
             Label for the x-axis.
         ylabel : str, optional
             Label for the y-axis.
+        ax : matplotlib.axis.Axis, optional
+            Axis to make the plot.
         """
-        
-        fig, ax = plt.subplots()
+
+        if ax is None:
+            fig, ax = plt.subplots()
+
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
