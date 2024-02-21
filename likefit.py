@@ -567,9 +567,9 @@ class LikelihoodFitter(ABC):
         plt.tight_layout()
         plt.show()
 
-    def plot_confidence_ellipses(self, parx_index=0, pary_index=1, ax=None):
+    def plot_confidence_ellipses(self, parx_index=0, pary_index=1, nsigma=2, ax=None):
         """
-        Plot the 1σ and 2σ confidence ellipses for a pair of parameters.
+        Plot the confidence ellipses for a pair of parameters.
 
         Parameters
         ----------
@@ -577,6 +577,8 @@ class LikelihoodFitter(ABC):
             Index of the x-axis parameter. The first parameter is plotted by default.
         pary_index : int, optional
             Index of the y-axis parameter. The second parameter is plotted by default.
+        nsigma : int, optional
+            Number of confidence ellipses to plot.
         ax : matplotlib.axis.Axis, optional
             Axis to make the plot.
         """
@@ -589,10 +591,26 @@ class LikelihoodFitter(ABC):
         estimators = self.get_estimators()
         ax.plot(estimators[parx_index], estimators[pary_index], 'o', label="Estimator")
 
-        ellipse1 = self.get_confidence_ellipse(parx_index, pary_index, nsigma=1)
-        ax.plot(*ellipse1, label=r"1σ")
-        ellipse2 = self.get_confidence_ellipse(parx_index, pary_index, nsigma=2)
-        ax.plot(*ellipse2, label=r"2σ")
+        # Set plot limits
+        errors = self.get_errors()
+
+        parx_min = estimators[parx_index] - (nsigma+1) * errors[parx_index]
+        parx_max = estimators[parx_index] + (nsigma+1) * errors[parx_index]
+        ax.set_xlim(parx_min, parx_max)
+
+        pary_min = estimators[pary_index] - (nsigma+1) * errors[pary_index]
+        pary_max = estimators[pary_index] + (nsigma+1) * errors[pary_index]
+        ax.set_ylim(pary_min, pary_max)
+
+        for k in np.arange(start=1, stop=nsigma+1):
+            ellipse = self.get_confidence_ellipse(parx_index, pary_index, nsigma=k)
+            ax.plot(*ellipse, ls='--', label=f"{k}σ")
+
+        errors = self.get_errors()
+        parx_min = estimators[parx_index] - nsigma * errors[parx_index]
+        parx_max = estimators[parx_index] + nsigma * errors[parx_index]
+        ax.set
+
         ax.legend()
 
     def plot_cost_function(self, parx_index=0, pary_index=1, xlabel=None, ylabel=None, nsigma=2):
@@ -648,7 +666,7 @@ class LikelihoodFitter(ABC):
 
         plt.show()
 
-    def plot_confidence_regions(self, parx_index=0, pary_index=1, xlabel=None, ylabel=None, nsigma=2):
+    def plot_confidence_regions(self, parx_index=0, pary_index=1, nsigma=2, ax=None):
         """
         Plot the confidence regions for a pair of parameters.
 
@@ -658,18 +676,21 @@ class LikelihoodFitter(ABC):
             Index of the x-axis parameter. The first parameter is plotted by default.
         pary_index : int
             Index of the y-axis parameter. The second parameter is plotted by default.
-        xlabel : str, optional
-            Label for the x-axis.
-        ylabel : str, optional
-            Label for the y-axis.
         nsigma : int, optional
             Number of sigma confidence levels to plot.
+        ax : matplotlib.axis.Axis, optional
+            Axis to make the plot.
 
         Returns
         -------
         None
         """
-        
+
+        if ax is None:
+            fig, ax = plt.subplots()
+            ax.set_xlabel(f"Parameter {parx_index}")
+            ax.set_ylabel(f"Parameter {pary_index}")
+
         # Calculate coordinates of the points to plot
         estimators = self.get_estimators()
         errors = self.get_errors()
@@ -686,11 +707,6 @@ class LikelihoodFitter(ABC):
         cost = self.vcost_function(parx_index, pary_index, parx, pary)
         z = np.sqrt(cost - cost.min())
 
-        # Plot
-        fig, ax = plt.subplots()
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
-
         # Levels of the contour lines
         sigma_levels = np.arange(0, nsigma+1)
         contours = ax.contour(x, y, z, levels=sigma_levels, colors='black', linestyles='dashed')
@@ -703,14 +719,6 @@ class LikelihoodFitter(ABC):
         plt.pcolormesh(x, y, z, shading='auto', cmap=plt.cm.viridis_r)
         clb = plt.colorbar()
         clb.ax.set_title(r"$n\sigma$")
-
-        # contours = ax.contourf(xdata, ydata, np.sqrt(z), levels=sigma_levels, cmap='Blues_r')
-        # clb = fig.colorbar(contours)
-        # clb.ax.set_title(r"$n\sigma$")
-
-        plt.tight_layout()
-        plt.show()
-
 
 class LinearLeastSquares(LikelihoodFitter):
     """
