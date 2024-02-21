@@ -1,12 +1,13 @@
 # Library to fit data with several likelihood functions
 
+import math
 from abc import ABC, abstractmethod
 import collections.abc
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import chi2
 import matplotlib.pyplot as plt
-from matplotlib import cm, colors
+from matplotlib import colors
 
 
 # Cost functions of the dependent variable y
@@ -77,7 +78,8 @@ def poisson_cost(mu: np.ndarray, nevents: np.ndarray) -> np.ndarray:
     return cost
 
 
-def binomial_cost(proba: float or np.ndarray, nsuccess: float or np.ndarray, ntrials: float or np.ndarray) -> np.ndarray:
+def binomial_cost(proba: float or np.ndarray, nsuccess: float or np.ndarray, ntrials: float or np.ndarray) \
+        -> np.ndarray:
     """
     Calculate the binomial costs for each data point.
 
@@ -606,14 +608,9 @@ class LikelihoodFitter(ABC):
             ellipse = self.get_confidence_ellipse(parx_index, pary_index, nsigma=k)
             ax.plot(*ellipse, ls='--', label=f"{k}σ")
 
-        errors = self.get_errors()
-        parx_min = estimators[parx_index] - nsigma * errors[parx_index]
-        parx_max = estimators[parx_index] + nsigma * errors[parx_index]
-        ax.set
-
         ax.legend()
 
-    def plot_cost_function(self, parx_index=0, pary_index=1, xlabel=None, ylabel=None, nsigma=2):
+    def plot_cost_function(self, parx_index=0, pary_index=1, nsigma=2, ax=None):
         """
         Plot the surface of the fit cost function for a pair of parameters.
 
@@ -623,13 +620,18 @@ class LikelihoodFitter(ABC):
             Index of the x-axis parameter. The first parameter is plotted by default.
         pary_index : int
             Index of the y-axis parameter. The second parameter is plotted by default.
-        xlabel : str, optional
-            Label for the x-axis.
-        ylabel : str, optional
-            Label for the y-axis.
         nsigma : int, optional
             Number of sigma confidence levels to include in the plot.
+        ax : matplotlib.axis.Axis, optional
+            Axis to make the plot.
         """
+
+        # TODO: fix the clipping of the z-axis title
+        if ax is None:
+            fig = plt.figure(figsize=(5, 4))
+            ax = fig.subplots(subplot_kw={"projection": "3d"})
+            ax.set_xlabel(f"Parameter {parx_index}")
+            ax.set_ylabel(f"Parameter {pary_index}")
 
         # Calculate coordinates of the points to plot
         estimators = self.get_estimators()
@@ -648,23 +650,15 @@ class LikelihoodFitter(ABC):
         z = cost - cost.min()
 
         # Plot
-        fig = plt.figure(figsize=(5, 4))
-        ax = fig.subplots(subplot_kw={"projection": "3d"})
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
         ax.set_zlabel(r"$-2\log(L/L_{max})$")
 
-        # Levels of the contour lines
-        sigma_levels = np.arange(0, 7)
-        bounds = sigma_levels ** 2
-        norm = colors.BoundaryNorm(boundaries=bounds, ncolors=128)
-        surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm, norm=norm)
+        # Scale the colors quadratically with z to include all the colormap evenly
+        sigma_max = math.sqrt(z.max())
+        sigma_levels = np.arange(0, sigma_max, step=0.1)
+        bounds = sigma_levels**2
+        norm = colors.BoundaryNorm(boundaries=bounds, ncolors=256)
 
-        # Plot colorbar
-        clb = plt.colorbar(surf, shrink=0.5, location='left')
-        clb.ax.set_title(r"$\sigma^2$")
-
-        plt.show()
+        ax.plot_surface(x, y, z, cmap=plt.cm.viridis_r, norm=norm)
 
     def plot_confidence_regions(self, parx_index=0, pary_index=1, nsigma=2, ax=None):
         """
@@ -705,20 +699,20 @@ class LikelihoodFitter(ABC):
 
         x, y = np.meshgrid(parx, pary)
         cost = self.vcost_function(parx_index, pary_index, parx, pary)
-        z = np.sqrt(cost - cost.min())
+        z = cost - cost.min()
 
         # Levels of the contour lines
-        sigma_levels = np.arange(0, nsigma+1)
-        contours = ax.contour(x, y, z, levels=sigma_levels, colors='black', linestyles='dashed')
+        cost_levels = np.arange(0, nsigma+1)**2
+        contours = ax.contour(x, y, z, levels=cost_levels, colors='black', linestyles='dashed')
 
-        def fmt(nsigma_label):
-            return f"{nsigma_label:.0f}σ"
+        def fmt(level):
+            sigma_label = math.sqrt(level)
+            return f"{sigma_label:.0f}σ"
 
         ax.clabel(contours, contours.levels, fmt=fmt, inline=True)
 
         plt.pcolormesh(x, y, z, shading='auto', cmap=plt.cm.viridis_r)
-        clb = plt.colorbar()
-        clb.ax.set_title(r"$n\sigma$")
+
 
 class LinearLeastSquares(LikelihoodFitter):
     """
