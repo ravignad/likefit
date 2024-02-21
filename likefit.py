@@ -567,16 +567,16 @@ class LikelihoodFitter(ABC):
         plt.tight_layout()
         plt.show()
 
-    def plot_confidence_ellipses(self, parx_index, pary_index, xlabel=None, ylabel=None):
+    def plot_confidence_ellipses(self, parx_index=0, pary_index=1, xlabel=None, ylabel=None):
         """
         Plot the 1σ and 2σ confidence ellipses for a pair of parameters.
 
         Parameters
         ----------
-        parx_index : int
-            Index of the x-axis parameter.
-        pary_index : int
-            Index of the y-axis parameter.
+        parx_index : int, optional
+            Index of the x-axis parameter. The first parameter is plotted by default.
+        pary_index : int, optional
+            Index of the y-axis parameter. The second parameter is plotted by default.
         xlabel : str, optional
             Label for the x-axis.
         ylabel : str, optional
@@ -599,16 +599,16 @@ class LikelihoodFitter(ABC):
         plt.tight_layout()
         plt.show()
 
-    def plot_cost_function(self, parx_index, pary_index, xlabel=None, ylabel=None, nsigma=2):
+    def plot_cost_function(self, parx_index=0, pary_index=1, xlabel=None, ylabel=None, nsigma=2):
         """
         Plot the surface of the fit cost function for a pair of parameters.
 
         Parameters
         ----------
         parx_index : int
-            Index of the x-axis parameter.
+            Index of the x-axis parameter. The first parameter is plotted by default.
         pary_index : int
-            Index of the y-axis parameter.
+            Index of the y-axis parameter. The second parameter is plotted by default.
         xlabel : str, optional
             Label for the x-axis.
         ylabel : str, optional
@@ -652,16 +652,16 @@ class LikelihoodFitter(ABC):
 
         plt.show()
 
-    def plot_confidence_regions(self, parx_index, pary_index, xlabel=None, ylabel=None, nsigma=2):
+    def plot_confidence_regions(self, parx_index=0, pary_index=1, xlabel=None, ylabel=None, nsigma=2):
         """
         Plot the confidence regions for a pair of parameters.
 
         Parameters
         ----------
         parx_index : int
-            Index of the x-axis parameter.
+            Index of the x-axis parameter. The first parameter is plotted by default.
         pary_index : int
-            Index of the y-axis parameter.
+            Index of the y-axis parameter. The second parameter is plotted by default.
         xlabel : str, optional
             Label for the x-axis.
         ylabel : str, optional
