@@ -567,7 +567,7 @@ class LikelihoodFitter(ABC):
         plt.tight_layout()
         plt.show()
 
-    def plot_confidence_ellipses(self, parx_index=0, pary_index=1, xlabel=None, ylabel=None):
+    def plot_confidence_ellipses(self, parx_index=0, pary_index=1, ax=None):
         """
         Plot the 1σ and 2σ confidence ellipses for a pair of parameters.
 
@@ -577,27 +577,23 @@ class LikelihoodFitter(ABC):
             Index of the x-axis parameter. The first parameter is plotted by default.
         pary_index : int, optional
             Index of the y-axis parameter. The second parameter is plotted by default.
-        xlabel : str, optional
-            Label for the x-axis.
-        ylabel : str, optional
-            Label for the y-axis.
+        ax : matplotlib.axis.Axis, optional
+            Axis to make the plot.
         """
 
-        fig, ax = plt.subplots()
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        if ax is None:
+            fig, ax = plt.subplots()
+            ax.set_xlabel(f"Parameter {parx_index}")
+            ax.set_ylabel(f"Parameter {pary_index}")
 
         estimators = self.get_estimators()
-        plt.plot(estimators[parx_index], estimators[pary_index], 'o', label="Estimator")
+        ax.plot(estimators[parx_index], estimators[pary_index], 'o', label="Estimator")
 
         ellipse1 = self.get_confidence_ellipse(parx_index, pary_index, nsigma=1)
-        plt.plot(*ellipse1, label=r"1σ")
+        ax.plot(*ellipse1, label=r"1σ")
         ellipse2 = self.get_confidence_ellipse(parx_index, pary_index, nsigma=2)
-        plt.plot(*ellipse2, label=r"2σ")
-
-        plt.legend()
-        plt.tight_layout()
-        plt.show()
+        ax.plot(*ellipse2, label=r"2σ")
+        ax.legend()
 
     def plot_cost_function(self, parx_index=0, pary_index=1, xlabel=None, ylabel=None, nsigma=2):
         """
