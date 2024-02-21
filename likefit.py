@@ -629,7 +629,7 @@ class LikelihoodFitter(ABC):
         # TODO: fix the clipping of the z-axis title
         if ax is None:
             fig = plt.figure(figsize=(5, 4))
-            ax = fig.subplots(subplot_kw={"projection": "3d"})
+            ax = fig.subplots(subplot_kw={'projection': '3d'})
             ax.set_xlabel(f"Parameter {parx_index}")
             ax.set_ylabel(f"Parameter {pary_index}")
 
