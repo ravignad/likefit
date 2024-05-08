@@ -18,8 +18,7 @@ python -m pip install likefit
   * Plot of error bands, confidence regions, and likelihood functions
 
 ## How to use
-
-Check the tutorials at the end of this README for examples on how to use LikeFit.
+These [demos](https://github.com/ravignad/likefit_demos.git) contain Jupyter notebooks that show how to use the LikeFit library.
 
 ## Contributing
 If you want to contribute, please fork the repository and use a feature
@@ -27,7 +26,7 @@ branch. Pull requests are warmly welcome.
 
 ## Links
 - Repository: https://github.com/ravignad/likefit/
-- Tutorials: https://bit.ly/3HFlFJ1
+- Demos: https://github.com/ravignad/likefit_demos.git
 
 ## Licensing
 The code in this project is licensed under MIT license.
