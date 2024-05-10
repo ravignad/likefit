@@ -547,9 +547,8 @@ class LikelihoodFitter(ABC):
 
         if ax is None:
             fig, ax = plt.subplots()
-
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
 
         # Plot data
         ax.errorbar(self.xdata, self.get_ydata(), self.get_ydata_errors(), ls='none', marker='o', label="Data")
