@@ -531,6 +531,7 @@ class LikelihoodFitter(ABC):
         print(f"Degrees of freedom: {self.get_ndof()}")
         print(f"Pvalue: {self.get_pvalue()}")
 
+    # TODO: check if figure generated be plot_fit can be saved with danatools.savefigs
     def plot_fit(self, xlabel="x", ylabel="y", ax=None):
         """
         Plot the data, the fit, and the error band.
