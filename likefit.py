@@ -224,7 +224,7 @@ class LikelihoodFitter(ABC):
                 cost1 = self.cost_function(par)
                 vcost.append(cost1)
 
-        vcost = np.reshape(vcost, newshape=(len(pary), len(parx)))
+        vcost = np.asarray(vcost).reshape(len(pary), len(parx))
         return vcost
 
     def fit(self, seed, **kwargs):

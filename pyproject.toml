@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "likefit"
-version = "0.2.3"
+version = "0.2.4"
 description = "Fit data with least squares and other likelihood methods"
 readme = "README.md"
 authors = [{ name = "Diego Ravignani", email = "diego.ravignani@gmail.com" }]
